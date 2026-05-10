@@ -4,15 +4,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Lançamento de IPTU Chain V2</title>
+  <title>IPTU Chain</title>
 
- <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-
-    console.log('Eventos registrados');
-
-});
-
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 
   <style>
     :root {
@@ -63,9 +57,7 @@
       margin-top: 8px
     }
 
-    input[type=text],
-    input[type=number],
-    textarea,
+    input,
     select {
       width: 100%;
       padding: 10px;
@@ -85,11 +77,6 @@
       cursor: pointer
     }
 
-    .muted {
-      color: var(--muted);
-      font-size: 13px
-    }
-
     .row {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -105,11 +92,8 @@
       margin-top: 8px
     }
 
-    footer {
-      margin-top: 12px;
-      color: var(--muted);
-      font-size: 13px;
-      text-align: center
+    .muted {
+      font-size: 13px
     }
 
     @media (max-width: 600px) {
@@ -125,61 +109,71 @@
   <div class="wrap">
 
     <header>
-      <h1>Lançamento de IPTU Chain V2</h1>
+      <h1>IPTU Chain</h1>
       <button id="connectBtn">Conectar MetaMask</button>
-      <div class="muted">Conta: <span id="addr">—</span></div>
+      <div class="muted">
+        Conta: <span id="addr">—</span>
+      </div>
     </header>
 
+    <!-- CONTRATO -->
     <div class="card">
 
       <div style="display:flex; align-items:center; gap:10px;">
 
-        <label for="contractAddr">Endereço do contrato</label>
+        <label>Endereço do contrato</label>
 
-        <input id="contractAddr" type="text" placeholder="0x..."
+        <input id="contractAddr"
+          type="text"
+          placeholder="0x..."
           style="width:500px; height:28px; margin-top:20px;" />
 
       </div>
 
-      <div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:8px;">
+      <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
         <button id="loadBtn">Carregar contrato</button>
-        <button id="refreshMetaBtn">Atualizar dados</button>
+        <button id="refreshBtn">Atualizar dados</button>
       </div>
 
-      <div class="result" id="status">Aguardando ação...</div>
+      <div class="result" id="status">
+        Aguardando ação...
+      </div>
+
     </div>
 
+    <!-- CONSULTA -->
     <div class="card">
 
-      <h3 style="color:#fff;margin-top:0">Consultar Lançamento</h3>
+      <h3 style="color:#fff;margin-top:0">
+        Consultar Lançamento
+      </h3>
 
       <div class="row">
 
         <div>
           <label>Inscrição</label>
-          <input id="inscricao" placeholder="ex: 12345-6" />
+          <input id="inscricao" placeholder="12345-6">
         </div>
 
         <div>
           <label>Ano</label>
-          <input id="ano" placeholder="2025" />
+          <input id="ano" placeholder="2025">
         </div>
 
       </div>
 
-      <label>Contribuinte</label>
-      <input id="contribuinteId" placeholder="0x..." />
+      <div style="display:flex; align-items:center; gap:10px; margin-top:10px;">
 
-      <div style="display:flex; align-items:center; gap:10px;">
+        <label>ID</label>
 
-        <label>ID (bytes32)</label>
-
-        <input id="idField" type="text" placeholder="0x..."
-          style="width:500px; height:28px; margin-top:20px;" />
+        <input id="idField"
+          type="text"
+          placeholder="0x..."
+          style="width:500px; height:28px;" />
 
       </div>
 
-      <div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:8px;">
+      <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
         <button id="makeIdBtn">Gerar ID</button>
         <button id="consultBtn">Consultar Resumo</button>
       </div>
@@ -188,417 +182,484 @@
 
     </div>
 
+    <!-- PAGAMENTO -->
     <div class="card">
 
-      <h3 style="color:#fff;margin-top:0">Pagar Parcela</h3>
+      <h3 style="color:#fff;margin-top:0">
+        Pagar Parcela
+      </h3>
 
       <label>ID do lançamento</label>
-      <input id="payId" placeholder="0x..." />
+      <input id="payId" placeholder="0x...">
 
       <div class="row">
 
         <div>
-          <label>Nº da parcela</label>
-          <input id="parcelaNum" placeholder="1" />
+          <label>Nº Parcela</label>
+          <input id="parcelaNum" placeholder="1">
         </div>
 
         <div>
-          <label>Valor Stablecoin</label>
-          <input id="parcelaVal" placeholder="ex: 100.00" />
+          <label>Valor ETH</label>
+          <input id="parcelaVal" placeholder="0.1">
         </div>
 
       </div>
 
-      <div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:8px;">
-        <button id="fillParcelValue">Buscar valor oficial</button>
-        <button id="payBtn">Pagar Parcela</button>
+      <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+        <button id="fillParcelValue">
+          Buscar valor oficial
+        </button>
+
+        <button id="payBtn">
+          Pagar Parcela
+        </button>
       </div>
 
       <div class="result" id="payStatus">—</div>
 
     </div>
 
+    <!-- ADMIN -->
     <div class="card" id="adminCard" style="display:none">
 
-      <h3 style="color:#fff;margin-top:0">Administração</h3>
+      <h3 style="color:#fff;margin-top:0">
+        Administração
+      </h3>
 
-      <details open>
+      <label>Inscrição</label>
+      <input id="l_inscricao">
 
-        <summary style="cursor:pointer">Lançar IPTU</summary>
+      <label>Contribuinte</label>
+      <input id="l_contribuinte" placeholder="0x...">
 
-        <div style="margin-top:8px">
+      <div class="row">
 
-          <label>Inscrição</label>
-          <input id="l_inscricao" />
-
-          <label>Contribuinte</label>
-          <input id="l_contribuinte" placeholder="0x..." />
-
-          <div class="row">
-
-            <div>
-              <label>Ano</label>
-              <input id="l_ano" />
-            </div>
-
-            <div>
-              <label>Parcelas</label>
-              <input id="l_parcelas" />
-            </div>
-
-          </div>
-
-          <label>Total Stablecoin</label>
-          <input id="l_total" />
-
-          <label>Hash Documento Jurídico</label>
-          <input id="docHash" placeholder="0x..." />
-
-          <div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:8px;">
-            <button id="lancarBtn">Lançar IPTU</button>
-          </div>
-
-          <div class="result" id="lancarStatus">—</div>
-
+        <div>
+          <label>Ano</label>
+          <input id="l_ano">
         </div>
 
-      </details>
+        <div>
+          <label>Parcelas</label>
+          <input id="l_parcelas">
+        </div>
+
+      </div>
+
+      <label>Total ETH</label>
+      <input id="l_total">
+
+      <div style="margin-top:8px;">
+        <button id="lancarBtn">
+          Lançar IPTU
+        </button>
+      </div>
+
+      <div class="result" id="lancarStatus">—</div>
 
     </div>
-
-    <footer>
-      IPTU Chain V2 — Auditoria blockchain para arrecadação municipal.
-    </footer>
 
   </div>
 
   <script>
 
-    console.log('IPTU Chain Front iniciado');
-
     const ABI = [
+
+      "function prefeitura() view returns(address)",
       "function owner() view returns(address)",
-      "function gerarId(string,address,uint256) pure returns(bytes32)",
-      "function getResumo(bytes32) view returns(string,address,uint256,uint256,uint256,uint256,uint256,uint256,bool,bytes32)",
-      "function lancarIPTU(string,address,uint256,uint256,uint256,bytes32)",
-      "function pagarParcela(bytes32,uint256)",
-      "event ParcelaPaga(bytes32 indexed id,uint256 parcela,address indexed contribuinte,uint256 valor,uint256 timestamp,bytes32 comprovanteHash)"
-    ];
 
-    const ERC20_ABI = [
-      "function approve(address spender,uint256 amount) returns(bool)"
-    ];
+      "function lancarIPTU(string inscricao,address contribuinte,uint256 ano,uint256 total,uint256 parcelas) returns(bytes32)",
 
-    const TOKEN_ADDRESS = "0xSEU_TOKEN_ERC20";
+      "function pagarParcela(bytes32 id,uint256 parcela) payable",
+
+      "function getResumo(bytes32 id) view returns(string,address,uint256,uint256,uint256,uint256,uint256,uint256,bool)",
+
+      "function listarParcelasPagas(bytes32 id) view returns(bool[])"
+
+    ];
 
     let provider;
     let signer;
     let contract;
-    let token;
     let connectedAddress;
-    let contractAddress;
 
-    function status(msg) {
+    function setStatus(msg) {
       document.getElementById('status').textContent = msg;
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
+    // CONNECT
 
-    console.log('DOM carregado');
-
-    const connectBtn = document.getElementById('connectBtn');
-    const loadBtn = document.getElementById('loadBtn');
-    const makeIdBtn = document.getElementById('makeIdBtn');
-    const consultBtn = document.getElementById('consultBtn');
-    const fillParcelValueBtn = document.getElementById('fillParcelValue');
-    const payBtn = document.getElementById('payBtn');
-    const lancarBtn = document.getElementById('lancarBtn');
-
-    if(connectBtn){
-      connectBtn.onclick = async () => {
-
-      if (!window.ethereum) {
-        alert('MetaMask não encontrado');
-        return;
-      }
-
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-      provider = new ethers.providers.Web3Provider(window.ethereum);
-      signer = provider.getSigner();
-
-      connectedAddress = await signer.getAddress();
-
-      document.getElementById('addr').textContent = connectedAddress;
-
-      const network = await provider.getNetwork();
-
-      if (network.chainId !== 137) {
-        alert('Conecte na Polygon');
-        return;
-      }
-
-      token = new ethers.Contract(TOKEN_ADDRESS, ERC20_ABI, signer);
-
-      status('Carteira conectada');
-
-    };
-
-    }
-
-    if(loadBtn){
-      loadBtn.onclick = async () => {
-
-      contractAddress = document.getElementById('contractAddr').value.trim();
-
-      if (!ethers.utils.isAddress(contractAddress)) {
-        alert('Contrato inválido');
-        return;
-      }
-
-      if (!provider || !signer) {
-        alert('Conecte a MetaMask primeiro');
-        return;
-      }
-
-      contract = new ethers.Contract(contractAddress, ABI, signer);
-
-      status('Contrato carregado com sucesso');
+    document.getElementById('connectBtn').onclick = async () => {
 
       try {
 
-        contract.on('ParcelaPaga', (
-          id,
-          parcela,
-          contribuinte,
-          valor,
-          timestamp,
-          comprovanteHash
-        ) => {
-
-          console.log('Evento auditável:', {
-            id,
-            parcela,
-            contribuinte,
-            valor: valor.toString(),
-            timestamp,
-            comprovanteHash
-          });
-
-        });
-
-      } catch (e) {
-        console.log(e);
-      }
-
-    };
-
-    }
-
-    if(makeIdBtn){
-      makeIdBtn.onclick = async () => {
-
-      if(!contract){
-        alert('Carregue o contrato primeiro');
-        return;
-      }
-
-      const inscr = document.getElementById('inscricao').value.trim();
-      const contribuinte = document.getElementById('contribuinteId').value.trim();
-      const ano = Number(document.getElementById('ano').value);
-
-      const id = ethers.utils.solidityKeccak256(
-        ['string', 'address', 'uint256'],
-        [inscr, contribuinte, ano]
-      );
-
-      document.getElementById('idField').value = id;
-      document.getElementById('payId').value = id;
-
-    };
-
-    }
-
-    if(consultBtn){
-      consultBtn.onclick = async () => {
-
-      if(!contract){
-        alert('Carregue o contrato primeiro');
-        return;
-      }
-
-      try {
-
-        const id = document.getElementById('idField').value.trim();
-
-        const r = await contract.getResumo(id);
-
-        let texto = '';
-
-        texto += 'Inscrição: ' + r[0] + '
-';
-        texto += 'Contribuinte: ' + r[1] + '
-';
-        texto += 'Ano: ' + r[2] + '
-';
-        texto += 'Total: ' + ethers.utils.formatUnits(r[3], 6) + '
-';
-        texto += 'Parcelas: ' + r[4] + '
-';
-        texto += 'Valor Parcela: ' + ethers.utils.formatUnits(r[5], 6) + '
-';
-        texto += 'Pagas: ' + r[6] + '
-';
-        texto += 'Valor Pago: ' + ethers.utils.formatUnits(r[7], 6) + '
-';
-        texto += 'Ativo: ' + r[8] + '
-';
-        texto += 'Documento Hash: ' + r[9] + '
-';
-
-        document.getElementById('resumoArea').textContent = texto;
-
-        document.getElementById('parcelaVal').value = ethers.utils.formatUnits(r[5], 6);
-
-      } catch (e) {
-        alert('Erro consulta');
-      }
-
-    };
-
-    }
-
-    if(fillParcelValueBtn){
-      fillParcelValueBtn.onclick = async () => {
-
-      if(!contract){
-        alert('Carregue o contrato primeiro');
-        return;
-      }
-
-      const id = document.getElementById('payId').value.trim();
-
-      const r = await contract.getResumo(id);
-
-      document.getElementById('parcelaVal').value = ethers.utils.formatUnits(r[5], 6);
-
-    };
-
-    }
-
-    if(payBtn){
-      payBtn.onclick = async () => {
-
-      if(!contract){
-        alert('Carregue o contrato primeiro');
-        return;
-      }
-
-      if(!token){
-        alert('Token ERC20 não inicializado');
-        return;
-      }
-
-      try {
-
-        const id = document.getElementById('payId').value.trim();
-        const parcela = Number(document.getElementById('parcelaNum').value);
-
-        const r = await contract.getResumo(id);
-
-        const valor = r[5];
-
-        const approveTx = await token.approve(contractAddress, valor);
-
-        await approveTx.wait();
-
-        const tx = await contract.pagarParcela(id, parcela);
-
-        document.getElementById('payStatus').textContent = 'Transação enviada: ' + tx.hash;
-
-        const receipt = await tx.wait();
-
-        const explorer = `https://polygonscan.com/tx/${tx.hash}`;
-
-        let comprovante = '';
-
-        comprovante += '✅ PAGAMENTO CONFIRMADO
-
-';
-        comprovante += 'TX HASH:
-' + tx.hash + '
-
-';
-        comprovante += 'EXPLORER:
-' + explorer + '
-
-';
-        comprovante += 'BLOCO:
-' + receipt.blockNumber + '
-';
-
-        document.getElementById('payStatus').textContent = comprovante;
-
-      } catch (e) {
-
-        console.log(e);
-
-        if (e.message.includes('Parcela ja paga')) {
-          alert('Parcela já quitada');
+        if (!window.ethereum) {
+          alert('MetaMask não encontrada');
           return;
         }
 
-        alert('Erro no pagamento');
+        await window.ethereum.request({
+          method: 'eth_requestAccounts'
+        });
 
-      }
+        provider = new ethers.providers.Web3Provider(window.ethereum);
 
-    };
+        signer = provider.getSigner();
 
-    }
+        connectedAddress = await signer.getAddress();
 
-    if(lancarBtn){
-      lancarBtn.onclick = async () => {
+        document.getElementById('addr').textContent =
+          connectedAddress;
 
-      if(!contract){
-        alert('Carregue o contrato primeiro');
-        return;
-      }
-
-      try {
-
-        const inscr = document.getElementById('l_inscricao').value.trim();
-        const cont = document.getElementById('l_contribuinte').value.trim();
-        const ano = Number(document.getElementById('l_ano').value);
-        const parcelas = Number(document.getElementById('l_parcelas').value);
-        const total = document.getElementById('l_total').value.trim();
-        const docHash = document.getElementById('docHash').value.trim();
-
-        const totalUnits = ethers.utils.parseUnits(total, 6);
-
-        const tx = await contract.lancarIPTU(
-          inscr,
-          cont,
-          ano,
-          totalUnits,
-          parcelas,
-          docHash
-        );
-
-        document.getElementById('lancarStatus').textContent = 'Tx enviada: ' + tx.hash;
-
-        await tx.wait();
-
-        document.getElementById('lancarStatus').textContent += '
-✅ Confirmada';
+        setStatus('Carteira conectada');
 
       } catch (e) {
 
         console.log(e);
-        alert('Erro ao lançar IPTU');
+        alert('Erro conexão');
 
       }
 
     };
+
+    // LOAD CONTRACT
+
+    document.getElementById('loadBtn').onclick = async () => {
+
+      try {
+
+        if (!provider) {
+          alert('Conecte a MetaMask primeiro');
+          return;
+        }
+
+        const addr =
+          document.getElementById('contractAddr')
+          .value.trim();
+
+        if (!ethers.utils.isAddress(addr)) {
+          alert('Contrato inválido');
+          return;
+        }
+
+        contract =
+          new ethers.Contract(
+            addr,
+            ABI,
+            signer
+          );
+
+        setStatus('Contrato carregado');
+
+        const owner =
+          await contract.owner();
+
+        const prefeitura =
+          await contract.prefeitura();
+
+        if (
+          connectedAddress.toLowerCase() === owner.toLowerCase() ||
+          connectedAddress.toLowerCase() === prefeitura.toLowerCase()
+        ) {
+
+          document.getElementById('adminCard')
+            .style.display = 'block';
+
+        }
+
+        // EVENTOS
+
+        contract.on(
+          'ParcelaPaga',
+          (
+            id,
+            parcela,
+            pagador,
+            valor,
+            timestamp
+          ) => {
+
+            console.log('Evento:', {
+              id,
+              parcela: parcela.toString(),
+              pagador,
+              valor: ethers.utils.formatEther(valor),
+              timestamp: timestamp.toString()
+            });
+
+          }
+        );
+
+      } catch (e) {
+
+        console.log(e);
+        alert('Erro carregar contrato');
+
+      }
+
+    };
+
+    // GERAR ID
+
+    document.getElementById('makeIdBtn').onclick = () => {
+
+      try {
+
+        const inscr =
+          document.getElementById('inscricao')
+          .value.trim();
+
+        const ano =
+          Number(
+            document.getElementById('ano').value
+          );
+
+        const id =
+          ethers.utils.solidityKeccak256(
+            ['string', 'uint256'],
+            [inscr, ano]
+          );
+
+        document.getElementById('idField').value =
+          id;
+
+        document.getElementById('payId').value =
+          id;
+
+      } catch (e) {
+
+        console.log(e);
+        alert('Erro gerar ID');
+
+      }
+
+    };
+
+    // CONSULTA
+
+    document.getElementById('consultBtn').onclick =
+      async () => {
+
+        try {
+
+          if (!contract) {
+            alert('Carregue o contrato');
+            return;
+          }
+
+          const id =
+            document.getElementById('idField')
+            .value.trim();
+
+          const r =
+            await contract.getResumo(id);
+
+          const parcelas =
+            await contract.listarParcelasPagas(id);
+
+          let texto = '';
+
+          texto += 'Inscrição: ' + r[0] + '\n';
+          texto += 'Contribuinte: ' + r[1] + '\n';
+          texto += 'Ano: ' + r[2] + '\n';
+          texto += 'Total: '
+            + ethers.utils.formatEther(r[3])
+            + ' ETH\n';
+
+          texto += 'Parcelas: ' + r[4] + '\n';
+
+          texto += 'Valor Parcela: '
+            + ethers.utils.formatEther(r[5])
+            + ' ETH\n';
+
+          texto += 'Pagas: ' + r[6] + '\n';
+
+          texto += 'Valor Pago: '
+            + ethers.utils.formatEther(r[7])
+            + ' ETH\n';
+
+          texto += 'Ativo: '
+            + r[8] + '\n';
+
+          texto += '\nParcelas:\n';
+
+          parcelas.forEach((p, i) => {
+
+            texto +=
+              `Parcela ${i + 1}: `
+              + (p ? 'PAGA' : 'ABERTA')
+              + '\n';
+
+          });
+
+          document.getElementById('resumoArea')
+            .textContent = texto;
+
+          document.getElementById('parcelaVal')
+            .value =
+            ethers.utils.formatEther(r[5]);
+
+        } catch (e) {
+
+          console.log(e);
+          alert('Erro consulta');
+
+        }
+
+      };
+
+    // BUSCAR VALOR
+
+    document.getElementById('fillParcelValue')
+      .onclick = async () => {
+
+        try {
+
+          const id =
+            document.getElementById('payId')
+            .value.trim();
+
+          const r =
+            await contract.getResumo(id);
+
+          document.getElementById('parcelaVal')
+            .value =
+            ethers.utils.formatEther(r[5]);
+
+        } catch (e) {
+
+          console.log(e);
+
+        }
+
+      };
+
+    // PAGAR
+
+    document.getElementById('payBtn').onclick =
+      async () => {
+
+        try {
+
+          const id =
+            document.getElementById('payId')
+            .value.trim();
+
+          const parcela =
+            Number(
+              document.getElementById('parcelaNum')
+              .value
+            );
+
+          const valor =
+            document.getElementById('parcelaVal')
+            .value.trim();
+
+          const valueWei =
+            ethers.utils.parseEther(valor);
+
+          const tx =
+            await contract.pagarParcela(
+              id,
+              parcela,
+              {
+                value: valueWei
+              }
+            );
+
+          document.getElementById('payStatus')
+            .textContent =
+            'Transação enviada:\n'
+            + tx.hash;
+
+          const receipt =
+            await tx.wait();
+
+          const explorer =
+            'https://polygonscan.com/tx/'
+            + tx.hash;
+
+          document.getElementById('payStatus')
+            .textContent +=
+
+            '\n\n✅ Confirmada'
+            + '\nBloco: '
+            + receipt.blockNumber
+            + '\nExplorer:\n'
+            + explorer;
+
+        } catch (e) {
+
+          console.log(e);
+          alert('Erro pagamento');
+
+        }
+
+      };
+
+    // LANÇAR IPTU
+
+    document.getElementById('lancarBtn')
+      .onclick = async () => {
+
+        try {
+
+          const inscr =
+            document.getElementById('l_inscricao')
+            .value.trim();
+
+          const contribuinte =
+            document.getElementById('l_contribuinte')
+            .value.trim();
+
+          const ano =
+            Number(
+              document.getElementById('l_ano')
+              .value
+            );
+
+          const parcelas =
+            Number(
+              document.getElementById('l_parcelas')
+              .value
+            );
+
+          const totalEth =
+            document.getElementById('l_total')
+            .value.trim();
+
+          const totalWei =
+            ethers.utils.parseEther(totalEth);
+
+          const tx =
+            await contract.lancarIPTU(
+              inscr,
+              contribuinte,
+              ano,
+              totalWei,
+              parcelas
+            );
+
+          document.getElementById('lancarStatus')
+            .textContent =
+            'Tx enviada:\n'
+            + tx.hash;
+
+          await tx.wait();
+
+          document.getElementById('lancarStatus')
+            .textContent +=
+            '\n✅ Confirmada';
+
+        } catch (e) {
+
+          console.log(e);
+          alert('Erro lançar IPTU');
+
+        }
+
+      };
 
   </script>
 
