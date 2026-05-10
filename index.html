@@ -281,7 +281,7 @@
       "function approve(address spender,uint256 amount) returns(bool)"
     ];
 
-    const TOKEN_ADDRESS = "0xSEU_TOKEN";
+    const TOKEN_ADDRESS = "0xSEU_TOKEN_ERC20";
 
     let provider;
     let signer;
@@ -332,6 +332,11 @@
         return;
       }
 
+      if (!provider || !signer) {
+        alert('Conecte a MetaMask primeiro');
+        return;
+      }
+
       contract = new ethers.Contract(contractAddress, ABI, signer);
 
       status('Contrato carregado com sucesso');
@@ -366,6 +371,11 @@
 
     document.getElementById('makeIdBtn').onclick = async () => {
 
+      if(!contract){
+        alert('Carregue o contrato primeiro');
+        return;
+      }
+
       const inscr = document.getElementById('inscricao').value.trim();
       const contribuinte = document.getElementById('contribuinteId').value.trim();
       const ano = Number(document.getElementById('ano').value);
@@ -381,6 +391,11 @@
     };
 
     document.getElementById('consultBtn').onclick = async () => {
+
+      if(!contract){
+        alert('Carregue o contrato primeiro');
+        return;
+      }
 
       try {
 
@@ -423,6 +438,11 @@
 
     document.getElementById('fillParcelValue').onclick = async () => {
 
+      if(!contract){
+        alert('Carregue o contrato primeiro');
+        return;
+      }
+
       const id = document.getElementById('payId').value.trim();
 
       const r = await contract.getResumo(id);
@@ -432,6 +452,16 @@
     };
 
     document.getElementById('payBtn').onclick = async () => {
+
+      if(!contract){
+        alert('Carregue o contrato primeiro');
+        return;
+      }
+
+      if(!token){
+        alert('Token ERC20 não inicializado');
+        return;
+      }
 
       try {
 
@@ -489,6 +519,11 @@
     };
 
     document.getElementById('lancarBtn').onclick = async () => {
+
+      if(!contract){
+        alert('Carregue o contrato primeiro');
+        return;
+      }
 
       try {
 
