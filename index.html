@@ -264,20 +264,21 @@
 
   <script>
 
-    const ABI = [
+const ABI = [
 
-      "function prefeitura() view returns(address)",
-      "function owner() view returns(address)",
+  "function prefeitura() view returns(address)",
+  "function owner() view returns(address)",
 
-      "function lancarIPTU(string inscricao,address contribuinte,uint256 ano,uint256 total,uint256 parcelas) returns(bytes32)",
+  "function lancarIPTU(string inscricao,address contribuinte,uint256 ano,uint256 total,uint256 parcelas) returns(bytes32)",
 
-      "function pagarParcela(bytes32 id,uint256 parcela) payable",
+  "function pagarParcela(bytes32 id,uint256 parcela) payable",
 
-      "function getResumo(bytes32 id) view returns(string,address,uint256,uint256,uint256,uint256,uint256,uint256,bool)",
+  "function getResumo(bytes32 id) view returns(string,address,uint256,uint256,uint256,uint256,uint256,uint256,bool)",
 
-      "function listarParcelasPagas(bytes32 id) view returns(bool[])"
+  "function listarParcelasPagas(bytes32 id) view returns(bool[])",
 
-    ];
+  "event ParcelaPaga(bytes32 indexed id,uint256 indexed parcela,address indexed pagador,uint256 valor,uint256 timestamp)"
+];
 
     let provider;
     let signer;
@@ -370,26 +371,30 @@
 
         // EVENTOS
 
-        contract.on(
-          'ParcelaPaga',
-          (
-            id,
-            parcela,
-            pagador,
-            valor,
-            timestamp
-          ) => {
+if(contract && contract.filters.ParcelaPaga){
 
-            console.log('Evento:', {
-              id,
-              parcela: parcela.toString(),
-              pagador,
-              valor: ethers.utils.formatEther(valor),
-              timestamp: timestamp.toString()
-            });
+  contract.on(
+    'ParcelaPaga',
+    (
+      id,
+      parcela,
+      pagador,
+      valor,
+      timestamp
+    ) => {
 
-          }
-        );
+      console.log('Evento:', {
+        id,
+        parcela: parcela.toString(),
+        pagador,
+        valor: ethers.utils.formatEther(valor),
+        timestamp: timestamp.toString()
+      });
+
+    }
+  );
+
+}
 
       } catch (e) {
 
