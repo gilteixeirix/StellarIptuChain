@@ -6,7 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Lançamento de IPTU Chain V2</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js">    }
+
+    console.log('Eventos registrados');
+
+});
+
+  </script>
 
   <style>
     :root {
@@ -268,6 +274,8 @@
 
   <script>
 
+    console.log('IPTU Chain Front iniciado');
+
     const ABI = [
       "function owner() view returns(address)",
       "function gerarId(string,address,uint256) pure returns(bytes32)",
@@ -294,7 +302,20 @@
       document.getElementById('status').textContent = msg;
     }
 
-    document.getElementById('connectBtn').onclick = async () => {
+    window.addEventListener('DOMContentLoaded', () => {
+
+    console.log('DOM carregado');
+
+    const connectBtn = document.getElementById('connectBtn');
+    const loadBtn = document.getElementById('loadBtn');
+    const makeIdBtn = document.getElementById('makeIdBtn');
+    const consultBtn = document.getElementById('consultBtn');
+    const fillParcelValueBtn = document.getElementById('fillParcelValue');
+    const payBtn = document.getElementById('payBtn');
+    const lancarBtn = document.getElementById('lancarBtn');
+
+    if(connectBtn){
+      connectBtn.onclick = async () => {
 
       if (!window.ethereum) {
         alert('MetaMask não encontrado');
@@ -323,7 +344,10 @@
 
     };
 
-    document.getElementById('loadBtn').onclick = async () => {
+    }
+
+    if(loadBtn){
+      loadBtn.onclick = async () => {
 
       contractAddress = document.getElementById('contractAddr').value.trim();
 
@@ -369,7 +393,10 @@
 
     };
 
-    document.getElementById('makeIdBtn').onclick = async () => {
+    }
+
+    if(makeIdBtn){
+      makeIdBtn.onclick = async () => {
 
       if(!contract){
         alert('Carregue o contrato primeiro');
@@ -390,7 +417,10 @@
 
     };
 
-    document.getElementById('consultBtn').onclick = async () => {
+    }
+
+    if(consultBtn){
+      consultBtn.onclick = async () => {
 
       if(!contract){
         alert('Carregue o contrato primeiro');
@@ -436,7 +466,10 @@
 
     };
 
-    document.getElementById('fillParcelValue').onclick = async () => {
+    }
+
+    if(fillParcelValueBtn){
+      fillParcelValueBtn.onclick = async () => {
 
       if(!contract){
         alert('Carregue o contrato primeiro');
@@ -451,7 +484,10 @@
 
     };
 
-    document.getElementById('payBtn').onclick = async () => {
+    }
+
+    if(payBtn){
+      payBtn.onclick = async () => {
 
       if(!contract){
         alert('Carregue o contrato primeiro');
@@ -518,7 +554,10 @@
 
     };
 
-    document.getElementById('lancarBtn').onclick = async () => {
+    }
+
+    if(lancarBtn){
+      lancarBtn.onclick = async () => {
 
       if(!contract){
         alert('Carregue o contrato primeiro');
