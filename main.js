@@ -2,19 +2,36 @@ let publicKey = ""
 
 const localHashes = {}
 
+/*
+  Conexão mockada da wallet
+*/
+
 async function connectWallet() {
 
-  publicKey =
-    "GD7AG3APDQEXOS3KFIG3RBFVKOJWJ4AZOHGECXCOFECCRGDNO43WIX6B"
+  try {
 
-  document.getElementById(
-    "walletAddress"
-  ).innerText = publicKey
+    publicKey =
+      "GD7AG3APDQEXOS3KFIG3RBFVKOJWJ4AZOHGECXCOFECCRGDNO43WIX6B"
 
-  alert(
-    "Carteira mock conectada!"
-  )
+    document.getElementById(
+      "walletAddress"
+    ).innerText = publicKey
+
+    alert(
+      "Carteira mock conectada!"
+    )
+
+  } catch(err){
+
+    console.error(err)
+
+    alert(err.message)
+  }
 }
+
+/*
+  Geração SHA-256
+*/
 
 async function generateSHA256(payload) {
 
@@ -44,6 +61,10 @@ async function generateSHA256(payload) {
     .join("")
 }
 
+/*
+  Ancoragem mockada
+*/
+
 async function anchorHash() {
 
   try {
@@ -51,7 +72,7 @@ async function anchorHash() {
     if (!publicKey) {
 
       alert(
-        "Conecte a carteira"
+        "Conecte a carteira primeiro"
       )
 
       return
@@ -76,6 +97,10 @@ async function anchorHash() {
       return
     }
 
+    /*
+      Payload auditável
+    */
+
     const payload =
       JSON.stringify({
 
@@ -88,10 +113,18 @@ async function anchorHash() {
 
       })
 
+    /*
+      SHA-256
+    */
+
     const hashHex =
       await generateSHA256(
         payload
       )
+
+    /*
+      Simula persistência blockchain
+    */
 
     localHashes[matricula] = {
 
@@ -101,8 +134,19 @@ async function anchorHash() {
 
     }
 
+    /*
+      Mock TX Hash
+    */
+
     const fakeTxHash =
       crypto.randomUUID()
+
+    const explorerUrl =
+      `https://stellar.expert/explorer/testnet/tx/${fakeTxHash}`
+
+    /*
+      Render HTML
+    */
 
     document.getElementById(
       "status"
@@ -110,7 +154,7 @@ async function anchorHash() {
 
       <p>
         <strong>
-          Payload
+          Payload Auditado
         </strong>
       </p>
 
@@ -119,7 +163,7 @@ async function anchorHash() {
       </small>
 
       <p class="success">
-        SHA-256
+        SHA-256 Gerado
       </p>
 
       <small>
@@ -130,6 +174,10 @@ async function anchorHash() {
         Hash ancorado na Stellar Testnet
       </p>
 
+      <p>
+        TX Hash
+      </p>
+
       <small>
         ${fakeTxHash}
       </small>
@@ -137,10 +185,10 @@ async function anchorHash() {
       <br/><br/>
 
       <a
-        href="https://stellar.expert/explorer/testnet/tx/${fakeTxHash}"
+        href="${explorerUrl}"
         target="_blank"
       >
-        Ver Explorer
+        Ver no Stellar Explorer
       </a>
 
     `
@@ -160,6 +208,11 @@ async function anchorHash() {
     `
   }
 }
+
+/*
+  Auditoria de integridade
+*/
+
 async function auditHash() {
 
   try {
@@ -197,7 +250,7 @@ async function auditHash() {
     }
 
     /*
-      Simula alteração fraudulenta
+      Simulação de alteração fraudulenta
     */
 
     const payloadAtual =
@@ -213,7 +266,7 @@ async function auditHash() {
       })
 
     /*
-      Recalcula hash
+      Recalcula SHA-256
     */
 
     const recalculatedHash =
@@ -221,16 +274,26 @@ async function auditHash() {
         payloadAtual
       )
 
+    /*
+      Verifica integridade
+    */
+
     const integrity =
       recalculatedHash ===
       record.hash
+
+    /*
+      Render auditoria
+    */
 
     document.getElementById(
       "auditResult"
     ).innerHTML = `
 
       <p>
-        Payload Original
+        <strong>
+          Payload Original
+        </strong>
       </p>
 
       <small>
@@ -238,7 +301,9 @@ async function auditHash() {
       </small>
 
       <p>
-        Payload Atual
+        <strong>
+          Payload Atual
+        </strong>
       </p>
 
       <small>
@@ -246,7 +311,9 @@ async function auditHash() {
       </small>
 
       <p>
-        Hash Original
+        <strong>
+          Hash Original
+        </strong>
       </p>
 
       <small>
@@ -254,7 +321,9 @@ async function auditHash() {
       </small>
 
       <p>
-        Hash Recalculado
+        <strong>
+          Hash Recalculado
+        </strong>
       </p>
 
       <small>
@@ -291,6 +360,4 @@ async function auditHash() {
 
     `
   }
-}
-
 }
