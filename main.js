@@ -160,7 +160,6 @@ async function anchorHash() {
     `
   }
 }
-
 async function auditHash() {
 
   try {
@@ -169,6 +168,15 @@ async function auditHash() {
       document.getElementById(
         "consultaMatricula"
       ).value
+
+    if (!matricula) {
+
+      alert(
+        "Informe a matrícula"
+      )
+
+      return
+    }
 
     const record =
       localHashes[matricula]
@@ -188,9 +196,29 @@ async function auditHash() {
       return
     }
 
+    /*
+      Simula alteração fraudulenta
+    */
+
+    const payloadAtual =
+      JSON.stringify({
+
+        matricula,
+
+        valor:"999999.99",
+
+        timestamp:
+          new Date().toISOString()
+
+      })
+
+    /*
+      Recalcula hash
+    */
+
     const recalculatedHash =
       await generateSHA256(
-        record.payload
+        payloadAtual
       )
 
     const integrity =
@@ -202,15 +230,23 @@ async function auditHash() {
     ).innerHTML = `
 
       <p>
-        Matrícula
+        Payload Original
       </p>
 
       <small>
-        ${matricula}
+        ${record.payload}
       </small>
 
       <p>
-        Hash armazenado
+        Payload Atual
+      </p>
+
+      <small>
+        ${payloadAtual}
+      </small>
+
+      <p>
+        Hash Original
       </p>
 
       <small>
@@ -218,7 +254,7 @@ async function auditHash() {
       </small>
 
       <p>
-        Hash recalculado
+        Hash Recalculado
       </p>
 
       <small>
@@ -234,7 +270,7 @@ async function auditHash() {
         ${
           integrity
             ? "Registro íntegro"
-            : "Alteração detectada"
+            : "ALTERAÇÃO DETECTADA"
         }
 
       </p>
@@ -244,5 +280,17 @@ async function auditHash() {
   } catch(err){
 
     console.error(err)
+
+    document.getElementById(
+      "auditResult"
+    ).innerHTML = `
+
+      <p class="error">
+        ${err.message}
+      </p>
+
+    `
   }
+}
+
 }
