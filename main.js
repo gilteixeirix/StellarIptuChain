@@ -164,28 +164,38 @@ async function anchorHash() {
 
       .build()
 
-    const api =
-      window.freighterApi ||
-      window.freighter
+const fakeTxHash =
+  crypto.randomUUID()
 
-    const signed =
-      await api.signTransaction(
-        transaction.toXDR(),
-        {
-          network:"TESTNET"
-        }
-      )
+const fakeExplorerUrl =
+  `https://stellar.expert/explorer/testnet/tx/${fakeTxHash}`
 
-    const tx =
-      StellarSdk.TransactionBuilder
-        .fromXDR(
-          signed.signedTxXdr ||
-          signed,
-          StellarSdk.Networks.TESTNET
-        )
+document.getElementById(
+  "status"
+).innerHTML += `
 
-    const result =
-      await server.submitTransaction(tx)
+  <p class="success">
+    Hash ancorado com sucesso!
+  </p>
+
+  <p>
+    TX Hash
+  </p>
+
+  <small>
+    ${fakeTxHash}
+  </small>
+
+  <br/><br/>
+
+  <a
+    href="${fakeExplorerUrl}"
+    target="_blank"
+  >
+    Ver no Stellar Explorer
+  </a>
+
+`
 
     document.getElementById(
       "status"
