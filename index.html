@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>IPTU Chain - Stellar Wallet</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/@stellar/stellar-sdk@13.3.0/dist/stellar-sdk.min.js"></script>
+  <script type="module">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.2/axios.min.js"></script>
 
   <style>
@@ -272,3 +272,131 @@
 
 </body>
 </html>
+<script type="module">
+
+import {
+  isConnected,
+  requestAccess,
+  getAddress,
+  signTransaction
+} from "https://esm.sh/@stellar/freighter-api";
+
+import * as StellarSdk from "https://esm.sh/@stellar/stellar-sdk";
+
+window.connectWallet = async function () {
+
+  try {
+
+    const connected = await isConnected();
+
+    if (!connected.isConnected) {
+      alert("Freighter não encontrada");
+      return;
+    }
+
+    await requestAccess();
+
+    const addressObj = await getAddress();
+
+    window.publicKey = addressObj.address;
+
+    document.getElementById("walletAddress").innerText =
+      window.publicKey;
+
+    alert("Carteira conectada!");
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(error.message);
+  }
+};
+
+window.anchorHash = async function () {
+
+  try {
+
+    if (!window.publicKey) {
+      alert("Conecte a carteira");
+      return;
+    }
+
+    const matricula =
+      document.getElementById("matricula").value;
+
+    const valor =
+      document.getElementById("valor").value;
+
+    const payload =
+      `${matricula}-${valor}-${Date.now()}`;
+
+    const encoder = new TextEncoder();
+
+    const data = encoder.encode(payload);
+
+    const hashBuffer =
+      await crypto.subtle.digest("SHA-256", data);
+
+    const hashArray =
+      Array.from(new Uint8Array(hashBuffer));
+
+    const hashHex = hashArray
+      .map(b => b.toString(16).padStart(2, "0"))
+      .join("");
+
+    const server = new StellarSdk.Horizon.Server(
+      "https://horizon-testnet.stellar.org"
+    );
+
+    const account =
+      await server.loadAccount(window.publicKey);
+
+    const tx = new StellarSdk.TransactionBuilder(account, {
+      fee: StellarSdk.BASE_FEE,
+      networkPassphrase:
+        StellarSdk.Networks.TESTNET
+    })
+      .addOperation(
+        StellarSdk.Operation.manageData({
+          name: "iptu_hash",
+          value: hashHex.slice(0, 64)
+        })
+      )
+      .setTimeout(30)
+      .build();
+
+    const signed = await signTransaction(
+      tx.toXDR(),
+      {
+        networkPassphrase:
+          StellarSdk.Networks.TESTNET
+      }
+    );
+
+    const finalTx =
+      StellarSdk.TransactionBuilder.fromXDR(
+        signed.signedTxXdr,
+        StellarSdk.Networks.TESTNET
+      );
+
+    const result =
+      await server.submitTransaction(finalTx);
+
+    document.getElementById("status").innerHTML = `
+      <p style="color:lime">
+        Hash ancorado!
+      </p>
+
+      <small>${result.hash}</small>
+    `;
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(error.message);
+  }
+};
+
+</script>
