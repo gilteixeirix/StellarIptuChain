@@ -1,269 +1,115 @@
-import './style.css'
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stellar-sdk/10.4.1/stellar-sdk.min.js"></script>
 
-import {
-  isConnected,
-  requestAccess,
-  getAddress,
-  signTransaction
-} from '@stellar/freighter-api'
+<script>
 
-import * as StellarSdk
-  from '@stellar/stellar-sdk'
+let publicKey = ""
 
-document.querySelector('#app').innerHTML = `
+async function connectWallet() {
 
-  <div class="container">
+  try {
 
-    <h1>IPTU Chain</h1>
+    if (
+      !window.freighterApi &&
+      !window.freighter
+    ) {
 
-    <p>
-      Auditoria de IPTU com Stellar Testnet
-    </p>
+      alert("Freighter não encontrada")
 
-    <button id="connectBtn">
-      Conectar Freighter
-    </button>
+      return
+    }
 
-    <div class="card">
+    const api =
+      window.freighterApi ||
+      window.freighter
 
-      <strong>Carteira:</strong>
+    const response =
+      await api.getAddress()
 
-      <div id="walletAddress">
-        Não conectada
-      </div>
+    publicKey =
+      response.address || response
 
-    </div>
+    document.getElementById(
+      "walletAddress"
+    ).innerText = publicKey
 
-    <div class="card">
+    alert("Carteira conectada!")
 
-      <input
-        id="matricula"
-        placeholder="Matrícula do imóvel"
-      />
+  } catch(err){
 
-      <input
-        id="valor"
-        placeholder="Valor IPTU"
-      />
+    console.error(err)
 
-      <button id="anchorBtn">
-        Ancorar Hash
-      </button>
+    alert(err.message)
+  }
+}
 
-      <div id="status"></div>
+async function anchorHash() {
 
-    </div>
+  try {
 
-  </div>
+    if (!publicKey) {
 
-`
+      alert("Conecte a carteira")
 
-let publicKey = ''
+      return
+    }
 
-const connectBtn =
-  document.querySelector('#connectBtn')
+    const matricula =
+      document.getElementById(
+        "matricula"
+      ).value
 
-const anchorBtn =
-  document.querySelector('#anchorBtn')
+    const valor =
+      document.getElementById(
+        "valor"
+      ).value
 
-connectBtn.addEventListener(
-  'click',
-  async () => {
+    const payload =
+      `${matricula}-${valor}-${Date.now()}`
 
-    try {
+    const encoder =
+      new TextEncoder()
 
-      const connected =
-        await isConnected()
+    const data =
+      encoder.encode(payload)
 
-      if (!connected.isConnected) {
-
-        alert(
-          'Freighter não encontrada'
-        )
-
-        return
-      }
-
-      await requestAccess()
-
-      const address =
-        await getAddress()
-
-      publicKey =
-        address.address
-
-      document.querySelector(
-        '#walletAddress'
-      ).innerText = publicKey
-
-      alert(
-        'Carteira conectada!'
+    const hashBuffer =
+      await crypto.subtle.digest(
+        "SHA-256",
+        data
       )
 
-    } catch(err){
+    const hashArray =
+      Array.from(
+        new Uint8Array(hashBuffer)
+      )
 
-      console.error(err)
+    const hashHex =
+      hashArray
+        .map(
+          b =>
+            b.toString(16)
+             .padStart(2, "0")
+        )
+        .join("")
 
-      alert(err.message)
-    }
+    document.getElementById(
+      "status"
+    ).innerHTML = `
+
+      <p style="color:lime">
+        Hash gerado:
+      </p>
+
+      <small>${hashHex}</small>
+
+    `
+
+  } catch(err){
+
+    console.error(err)
+
+    alert(err.message)
   }
-)
+}
 
-anchorBtn.addEventListener(
-  'click',
-  async () => {
-
-    try {
-
-      if (!publicKey) {
-
-        alert(
-          'Conecte a carteira'
-        )
-
-        return
-      }
-
-      const matricula =
-        document.querySelector(
-          '#matricula'
-        ).value
-
-      const valor =
-        document.querySelector(
-          '#valor'
-        ).value
-
-      if (!matricula || !valor) {
-
-        alert(
-          'Preencha os campos'
-        )
-
-        return
-      }
-
-      const payload =
-        `${matricula}-${valor}-${Date.now()}`
-
-      const encoder =
-        new TextEncoder()
-
-      const data =
-        encoder.encode(payload)
-
-      const hashBuffer =
-        await crypto.subtle.digest(
-          'SHA-256',
-          data
-        )
-
-      const hashArray =
-        Array.from(
-          new Uint8Array(hashBuffer)
-        )
-
-      const hashHex =
-        hashArray
-          .map(
-            b =>
-              b
-                .toString(16)
-                .padStart(2, '0')
-          )
-          .join('')
-
-      const server =
-        new StellarSdk.Horizon.Server(
-          'https://horizon-testnet.stellar.org'
-        )
-
-      const account =
-        await server.loadAccount(
-          publicKey
-        )
-
-      const tx =
-        new StellarSdk.TransactionBuilder(
-          account,
-          {
-            fee:
-              StellarSdk.BASE_FEE,
-
-            networkPassphrase:
-              StellarSdk.Networks.TESTNET
-          }
-        )
-
-        .addOperation(
-          StellarSdk.Operation.manageData({
-            name: 'iptu_hash',
-            value:
-              hashHex.slice(0, 64)
-          })
-        )
-
-        .setTimeout(30)
-
-        .build()
-
-      const signed =
-        await signTransaction(
-          tx.toXDR(),
-          {
-            networkPassphrase:
-              StellarSdk.Networks.TESTNET
-          }
-        )
-
-      const finalTx =
-        StellarSdk.TransactionBuilder
-          .fromXDR(
-            signed.signedTxXdr,
-            StellarSdk.Networks.TESTNET
-          )
-
-      const result =
-        await server.submitTransaction(
-          finalTx
-        )
-
-      document.querySelector(
-        '#status'
-      ).innerHTML = `
-
-        <p class="success">
-          Hash ancorado!
-        </p>
-
-        <small>
-          ${result.hash}
-        </small>
-
-        <br/><br/>
-
-        <a
-          href="https://stellar.expert/explorer/testnet/tx/${result.hash}"
-          target="_blank"
-        >
-          Ver Explorer
-        </a>
-
-      `
-
-    } catch(err){
-
-      console.error(err)
-
-      document.querySelector(
-        '#status'
-      ).innerHTML = `
-
-        <p class="error">
-          ${err.message}
-        </p>
-
-      `
-    }
-  }
-)
+</script>
