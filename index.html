@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 
 <head>
+
   <meta charset="UTF-8" />
 
   <meta
@@ -27,19 +28,21 @@
     <h1>IPTU Chain</h1>
 
     <p>
-      Auditoria de IPTU com Stellar Testnet
+      Auditoria municipal com Stellar Testnet
     </p>
 
     <button
       class="connect-btn"
       onclick="connectWallet()"
     >
-      Conectar Carteira Stellar
+      Conectar Freighter
     </button>
 
     <div class="card">
 
-      <strong>Carteira:</strong>
+      <strong>
+        Carteira
+      </strong>
 
       <div id="walletAddress">
         Não conectada
@@ -49,12 +52,14 @@
 
     <div class="card">
 
-      <strong>Matrícula</strong>
+      <strong>
+        Matrícula do imóvel
+      </strong>
 
       <input
         type="text"
         id="matricula"
-        placeholder="Ex: IPTU-2026-0001"
+        placeholder="IPTU-2026-0001"
       />
 
       <strong>
@@ -71,10 +76,33 @@
         class="anchor-btn"
         onclick="anchorHash()"
       >
-        Ancorar Hash
+        Gerar + Ancorar Hash
       </button>
 
       <div id="status"></div>
+
+    </div>
+
+    <div class="card">
+
+      <strong>
+        Consulta / Auditoria
+      </strong>
+
+      <input
+        type="text"
+        id="consultaMatricula"
+        placeholder="Consultar matrícula"
+      />
+
+      <button
+        class="audit-btn"
+        onclick="auditHash()"
+      >
+        Auditar Matrícula
+      </button>
+
+      <div id="auditResult"></div>
 
     </div>
 
