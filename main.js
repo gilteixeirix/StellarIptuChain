@@ -4,21 +4,48 @@ async function connectWallet() {
 
   try {
 
-    const api =
-      window.freighterApi ||
-      window.freighter
+    let api = null
+
+    if (window.freighterApi) {
+      api = window.freighterApi
+    }
+
+    else if (window.freighter) {
+      api = window.freighter
+    }
+
+    else if (window.stellar) {
+      api = window.stellar
+    }
 
     if (!api) {
 
+      console.log(window)
+
       alert(
-        "Freighter Wallet não encontrada"
+        "Freighter API não encontrada"
       )
 
       return
     }
 
-    const response =
-      await api.getAddress()
+    console.log("API encontrada:", api)
+
+    let response = null
+
+    if (api.getAddress) {
+
+      response =
+        await api.getAddress()
+
+    } else {
+
+      throw new Error(
+        "Método getAddress não encontrado"
+      )
+    }
+
+    console.log(response)
 
     publicKey =
       response.address || response
@@ -27,9 +54,7 @@ async function connectWallet() {
       "walletAddress"
     ).innerText = publicKey
 
-    alert(
-      "Carteira conectada!"
-    )
+    alert("Carteira conectada!")
 
   } catch(err){
 
