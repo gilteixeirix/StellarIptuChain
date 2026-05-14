@@ -11,32 +11,15 @@ async function connectWallet() {
 
   try {
 
-    const api =
-      window.freighterApi ||
-      window.freighter ||
-      window.stellar
-
-    if (!api) {
-
-      alert(
-        "Freighter API não encontrada"
-      )
-
-      return
-    }
-
-    const response =
-      await api.getAddress()
-
     publicKey =
-      response.address || response
+      "GD7AG3APDQEXOS3KFIG3RBFVKOJWJ4AZOHGECXCOFECCRGDNO43WIX6B"
 
     document.getElementById(
       "walletAddress"
     ).innerText = publicKey
 
     alert(
-      "Carteira conectada!"
+      "Carteira mock conectada!"
     )
 
   } catch(err){
