@@ -96,8 +96,21 @@ async function anchorHash() {
       return
     }
 
-    const payload =
-      `${matricula}-${valor}-${Date.now()}`
+    const payload = JSON.stringify({
+
+      matricula,
+
+      valor,
+
+      timestamp:
+        new Date().toISOString()
+
+    })
+
+    console.log(
+      "Payload:",
+      payload
+    )
 
     const encoder =
       new TextEncoder()
@@ -125,97 +138,36 @@ async function anchorHash() {
         )
         .join("")
 
+    console.log(
+      "SHA-256:",
+      hashHex
+    )
+
     document.getElementById(
       "status"
     ).innerHTML = `
 
       <p>
-        Hash gerado:
+        <strong>
+          Payload Auditado
+        </strong>
+      </p>
+
+      <small>
+        ${payload}
+      </small>
+
+      <br/><br/>
+
+      <p>
+        <strong>
+          SHA-256 Gerado
+        </strong>
       </p>
 
       <small>
         ${hashHex}
       </small>
-
-    `
-
-    const server =
-      new StellarSdk.Server(
-        "https://horizon-testnet.stellar.org"
-      )
-
-    const account =
-      await server.loadAccount(
-        publicKey
-      )
-
-    const transaction =
-      new StellarSdk.TransactionBuilder(
-        account,
-        {
-          fee:"100",
-          networkPassphrase:
-            StellarSdk.Networks.TESTNET
-        }
-      )
-
-      .addOperation(
-        StellarSdk.Operation.manageData({
-          name:"iptu_hash",
-          value:hashHex.slice(0,64)
-        })
-      )
-
-      .setTimeout(30)
-
-      .build()
-
-    const api =
-      window.freighterApi ||
-      window.freighter
-
-    const signed =
-      await api.signTransaction(
-        transaction.toXDR(),
-        {
-          network:
-            "TESTNET"
-        }
-      )
-
-    const tx =
-      StellarSdk.TransactionBuilder
-        .fromXDR(
-          signed.signedTxXdr ||
-          signed,
-          StellarSdk.Networks.TESTNET
-        )
-
-    const result =
-      await server.submitTransaction(
-        tx
-      )
-
-    document.getElementById(
-      "status"
-    ).innerHTML += `
-
-      <p class="success">
-        Hash ancorado!
-      </p>
-
-      <small>
-        ${result.hash}
-      </small>
-
-      <br/><br/>
-
-      <a
-        href="https://stellar.expert/explorer/testnet/tx/${result.hash}"
-        target="_blank"
-      >
-        Ver transação
-      </a>
 
     `
 
