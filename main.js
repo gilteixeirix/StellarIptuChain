@@ -1,26 +1,21 @@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/stellar-sdk/10.4.1/stellar-sdk.min.js"></script>
-
-<script>
-
 let publicKey = ""
 
 async function connectWallet() {
 
   try {
 
-    if (
-      !window.freighterApi &&
-      !window.freighter
-    ) {
-
-      alert("Freighter não encontrada")
-
-      return
-    }
-
     const api =
       window.freighterApi ||
       window.freighter
+
+    if (!api) {
+
+      alert(
+        "Freighter Wallet não encontrada"
+      )
+
+      return
+    }
 
     const response =
       await api.getAddress()
@@ -32,7 +27,9 @@ async function connectWallet() {
       "walletAddress"
     ).innerText = publicKey
 
-    alert("Carteira conectada!")
+    alert(
+      "Carteira conectada!"
+    )
 
   } catch(err){
 
@@ -48,7 +45,9 @@ async function anchorHash() {
 
     if (!publicKey) {
 
-      alert("Conecte a carteira")
+      alert(
+        "Conecte a carteira primeiro"
+      )
 
       return
     }
@@ -62,6 +61,15 @@ async function anchorHash() {
       document.getElementById(
         "valor"
       ).value
+
+    if (!matricula || !valor) {
+
+      alert(
+        "Preencha os campos"
+      )
+
+      return
+    }
 
     const payload =
       `${matricula}-${valor}-${Date.now()}`
@@ -96,11 +104,93 @@ async function anchorHash() {
       "status"
     ).innerHTML = `
 
-      <p style="color:lime">
+      <p>
         Hash gerado:
       </p>
 
-      <small>${hashHex}</small>
+      <small>
+        ${hashHex}
+      </small>
+
+    `
+
+    const server =
+      new StellarSdk.Server(
+        "https://horizon-testnet.stellar.org"
+      )
+
+    const account =
+      await server.loadAccount(
+        publicKey
+      )
+
+    const transaction =
+      new StellarSdk.TransactionBuilder(
+        account,
+        {
+          fee:"100",
+          networkPassphrase:
+            StellarSdk.Networks.TESTNET
+        }
+      )
+
+      .addOperation(
+        StellarSdk.Operation.manageData({
+          name:"iptu_hash",
+          value:hashHex.slice(0,64)
+        })
+      )
+
+      .setTimeout(30)
+
+      .build()
+
+    const api =
+      window.freighterApi ||
+      window.freighter
+
+    const signed =
+      await api.signTransaction(
+        transaction.toXDR(),
+        {
+          network:
+            "TESTNET"
+        }
+      )
+
+    const tx =
+      StellarSdk.TransactionBuilder
+        .fromXDR(
+          signed.signedTxXdr ||
+          signed,
+          StellarSdk.Networks.TESTNET
+        )
+
+    const result =
+      await server.submitTransaction(
+        tx
+      )
+
+    document.getElementById(
+      "status"
+    ).innerHTML += `
+
+      <p class="success">
+        Hash ancorado!
+      </p>
+
+      <small>
+        ${result.hash}
+      </small>
+
+      <br/><br/>
+
+      <a
+        href="https://stellar.expert/explorer/testnet/tx/${result.hash}"
+        target="_blank"
+      >
+        Ver transação
+      </a>
 
     `
 
@@ -108,8 +198,14 @@ async function anchorHash() {
 
     console.error(err)
 
-    alert(err.message)
+    document.getElementById(
+      "status"
+    ).innerHTML = `
+
+      <p class="error">
+        ${err.message}
+      </p>
+
+    `
   }
 }
-
-</script>
