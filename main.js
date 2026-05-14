@@ -3,34 +3,25 @@ let publicKey = ""
 const localHashes = {}
 
 /*
-  Conexão mockada da wallet
+  Wallet mockada
 */
 
 async function connectWallet() {
 
-  try {
+  publicKey =
+    "GD7AG3APDQEXOS3KFIG3RBFVKOJWJ4AZOHGECXCOFECCRGDNO43WIX6B"
 
-    publicKey =
-      "GD7AG3APDQEXOS3KFIG3RBFVKOJWJ4AZOHGECXCOFECCRGDNO43WIX6B"
+  document.getElementById(
+    "walletAddress"
+  ).innerText = publicKey
 
-    document.getElementById(
-      "walletAddress"
-    ).innerText = publicKey
-
-    alert(
-      "Carteira mock conectada!"
-    )
-
-  } catch(err){
-
-    console.error(err)
-
-    alert(err.message)
-  }
+  alert(
+    "Carteira mock conectada!"
+  )
 }
 
 /*
-  Geração SHA-256
+  SHA-256
 */
 
 async function generateSHA256(payload) {
@@ -62,7 +53,7 @@ async function generateSHA256(payload) {
 }
 
 /*
-  Ancoragem mockada
+  Registro e ancoragem mockada
 */
 
 async function anchorHash() {
@@ -98,7 +89,7 @@ async function anchorHash() {
     }
 
     /*
-      Payload auditável
+      Payload original
     */
 
     const payload =
@@ -123,7 +114,7 @@ async function anchorHash() {
       )
 
     /*
-      Simula persistência blockchain
+      Persistência mockada
     */
 
     localHashes[matricula] = {
@@ -135,7 +126,7 @@ async function anchorHash() {
     }
 
     /*
-      Mock TX Hash
+      TX fake
     */
 
     const fakeTxHash =
@@ -145,7 +136,7 @@ async function anchorHash() {
       `https://stellar.expert/explorer/testnet/tx/${fakeTxHash}`
 
     /*
-      Render HTML
+      Render
     */
 
     document.getElementById(
@@ -153,9 +144,7 @@ async function anchorHash() {
     ).innerHTML = `
 
       <p>
-        <strong>
-          Payload Auditado
-        </strong>
+        Payload Auditado
       </p>
 
       <small>
@@ -174,21 +163,17 @@ async function anchorHash() {
         Hash ancorado na Stellar Testnet
       </p>
 
-      <p>
-        TX Hash
-      </p>
-
       <small>
         ${fakeTxHash}
       </small>
 
-      <br/><br/>
+      <br><br>
 
       <a
         href="${explorerUrl}"
         target="_blank"
       >
-        Ver no Stellar Explorer
+        Ver no Explorer
       </a>
 
     `
@@ -210,7 +195,7 @@ async function anchorHash() {
 }
 
 /*
-  Auditoria de integridade
+  Auditoria
 */
 
 async function auditHash() {
@@ -222,10 +207,15 @@ async function auditHash() {
         "consultaMatricula"
       ).value
 
-    if (!matricula) {
+    const valorAtual =
+      document.getElementById(
+        "consultaValor"
+      ).value
+
+    if (!matricula || !valorAtual) {
 
       alert(
-        "Digite a matrícula"
+        "Preencha os campos"
       )
 
       return
@@ -250,28 +240,55 @@ async function auditHash() {
     }
 
     /*
-      Usa payload ORIGINAL
+      Recupera timestamp original
+    */
+
+    const originalData =
+      JSON.parse(record.payload)
+
+    /*
+      Reconstrói payload atual
+    */
+
+    const payloadAtual =
+      JSON.stringify({
+
+        matricula,
+
+        valor: valorAtual,
+
+        timestamp:
+          originalData.timestamp
+
+      })
+
+    /*
+      Recalcula SHA-256
     */
 
     const recalculatedHash =
       await generateSHA256(
-        record.payload
+        payloadAtual
       )
 
     const integrity =
       recalculatedHash ===
       record.hash
 
+    /*
+      Render auditoria
+    */
+
     document.getElementById(
       "auditResult"
     ).innerHTML = `
 
       <p>
-        Payload
+        Payload Atual
       </p>
 
       <small>
-        ${record.payload}
+        ${payloadAtual}
       </small>
 
       <p>
@@ -309,5 +326,15 @@ async function auditHash() {
   } catch(err){
 
     console.error(err)
+
+    document.getElementById(
+      "auditResult"
+    ).innerHTML = `
+
+      <p class="error">
+        ${err.message}
+      </p>
+
+    `
   }
 }
