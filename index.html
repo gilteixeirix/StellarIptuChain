@@ -14,110 +14,10 @@
     IPTU Chain
   </title>
 
-  <style>
-
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      font-family:Arial;
-    }
-
-    body{
-      background:#0f172a;
-      color:white;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      min-height:100vh;
-      padding:20px;
-    }
-
-    .container{
-      width:100%;
-      max-width:600px;
-      background:#1e293b;
-      padding:30px;
-      border-radius:20px;
-    }
-
-    h1{
-      text-align:center;
-      margin-bottom:10px;
-      color:#38bdf8;
-    }
-
-    p{
-      text-align:center;
-      margin-bottom:20px;
-    }
-
-    .card{
-      background:#334155;
-      padding:15px;
-      border-radius:12px;
-      margin-top:20px;
-    }
-
-    input{
-      width:100%;
-      padding:12px;
-      border:none;
-      border-radius:10px;
-      margin-top:10px;
-      margin-bottom:10px;
-      background:#0f172a;
-      color:white;
-    }
-
-    button{
-      width:100%;
-      padding:14px;
-      border:none;
-      border-radius:12px;
-      cursor:pointer;
-      font-weight:bold;
-      margin-top:10px;
-    }
-
-    .connect-btn{
-      background:#38bdf8;
-    }
-
-    .anchor-btn{
-      background:#22c55e;
-      color:white;
-    }
-
-    .audit-btn{
-      background:#f59e0b;
-      color:white;
-    }
-
-    small{
-      display:block;
-      margin-top:10px;
-      background:#0f172a;
-      padding:10px;
-      border-radius:10px;
-      word-break:break-all;
-    }
-
-    .success{
-      color:#22c55e;
-      margin-top:10px;
-    }
-
-    .error{
-      color:#ef4444;
-      margin-top:10px;
-    }
-
-    a{
-      color:#38bdf8;
-    }
-
-  </style>
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
 
 </head>
 
@@ -130,8 +30,10 @@
     </h1>
 
     <p>
-      Auditoria Fiscal Blockchain
+      Auditoria Fiscal com Blockchain Stellar
     </p>
+
+    <!-- WALLET -->
 
     <button
       class="connect-btn"
@@ -143,7 +45,7 @@
     <div class="card">
 
       <strong>
-        Carteira
+        Carteira Conectada
       </strong>
 
       <small id="walletAddress">
@@ -152,13 +54,16 @@
 
     </div>
 
+    <!-- REGISTRO -->
+
     <div class="card">
 
       <strong>
-        Matrícula
+        Matrícula do Imóvel
       </strong>
 
       <input
+        type="text"
         id="matricula"
         placeholder="IPTU-2026-0001"
       >
@@ -168,6 +73,7 @@
       </strong>
 
       <input
+        type="text"
         id="valor"
         placeholder="1500.00"
       >
@@ -176,22 +82,35 @@
         class="anchor-btn"
         onclick="anchorHash()"
       >
-        Gerar SHA-256
+        Gerar SHA-256 + Ancorar
       </button>
 
       <div id="status"></div>
 
     </div>
 
+    <!-- AUDITORIA -->
+
     <div class="card">
 
       <strong>
-        Auditoria
+        Auditoria por Matrícula
       </strong>
 
       <input
+        type="text"
         id="consultaMatricula"
         placeholder="Digite a matrícula"
+      >
+
+      <strong>
+        Valor Atual IPTU
+      </strong>
+
+      <input
+        type="text"
+        id="consultaValor"
+        placeholder="Digite o valor atual"
       >
 
       <button
@@ -207,260 +126,7 @@
 
   </div>
 
-  <script>
-
-    let publicKey = ""
-
-    const localHashes = {}
-
-    async function connectWallet() {
-
-      publicKey =
-        "GD7AG3APDQEXOS3KFIG3RBFVKOJWJ4AZOHGECXCOFECCRGDNO43WIX6B"
-
-      document.getElementById(
-        "walletAddress"
-      ).innerText = publicKey
-
-      alert(
-        "Carteira mock conectada!"
-      )
-    }
-
-    async function generateSHA256(payload) {
-
-      const encoder =
-        new TextEncoder()
-
-      const data =
-        encoder.encode(payload)
-
-      const hashBuffer =
-        await crypto.subtle.digest(
-          "SHA-256",
-          data
-        )
-
-      const hashArray =
-        Array.from(
-          new Uint8Array(hashBuffer)
-        )
-
-      return hashArray
-        .map(
-          b =>
-            b.toString(16)
-             .padStart(2, "0")
-        )
-        .join("")
-    }
-
-    async function anchorHash() {
-
-      try {
-
-        if (!publicKey) {
-
-          alert(
-            "Conecte a carteira"
-          )
-
-          return
-        }
-
-        const matricula =
-          document.getElementById(
-            "matricula"
-          ).value
-
-        const valor =
-          document.getElementById(
-            "valor"
-          ).value
-
-        if (!matricula || !valor) {
-
-          alert(
-            "Preencha os campos"
-          )
-
-          return
-        }
-
-        const payload =
-          JSON.stringify({
-
-            matricula,
-
-            valor,
-
-            timestamp:
-              new Date().toISOString()
-
-          })
-
-        const hashHex =
-          await generateSHA256(
-            payload
-          )
-
-        localHashes[matricula] = {
-
-          payload,
-
-          hash:hashHex
-
-        }
-
-        const fakeTxHash =
-          crypto.randomUUID()
-
-        document.getElementById(
-          "status"
-        ).innerHTML = `
-
-          <p>
-            Payload
-          </p>
-
-          <small>
-            ${payload}
-          </small>
-
-          <p class="success">
-            SHA-256
-          </p>
-
-          <small>
-            ${hashHex}
-          </small>
-
-          <p class="success">
-            Hash ancorado
-          </p>
-
-          <small>
-            ${fakeTxHash}
-          </small>
-
-          <br><br>
-
-          <a
-            href="https://stellar.expert/explorer/testnet/tx/${fakeTxHash}"
-            target="_blank"
-          >
-            Ver Explorer
-          </a>
-
-        `
-
-      } catch(err){
-
-        console.error(err)
-
-        document.getElementById(
-          "status"
-        ).innerHTML = `
-
-          <p class="error">
-            ${err.message}
-          </p>
-
-        `
-      }
-    }
-
-    async function auditHash() {
-
-      try {
-
-        const matricula =
-          document.getElementById(
-            "consultaMatricula"
-          ).value
-
-        const record =
-          localHashes[matricula]
-
-        if (!record) {
-
-          document.getElementById(
-            "auditResult"
-          ).innerHTML = `
-
-            <p class="error">
-              Matrícula não encontrada
-            </p>
-
-          `
-
-          return
-        }
-
-        const payloadAtual =
-          JSON.stringify({
-
-            matricula,
-
-            valor:"999999.99",
-
-            timestamp:
-              new Date().toISOString()
-
-          })
-
-        const recalculatedHash =
-          await generateSHA256(
-            payloadAtual
-          )
-
-        const integrity =
-          recalculatedHash ===
-          record.hash
-
-        document.getElementById(
-          "auditResult"
-        ).innerHTML = `
-
-          <p>
-            Hash Original
-          </p>
-
-          <small>
-            ${record.hash}
-          </small>
-
-          <p>
-            Hash Recalculado
-          </p>
-
-          <small>
-            ${recalculatedHash}
-          </small>
-
-          <p class="${
-            integrity
-              ? "success"
-              : "error"
-          }">
-
-            ${
-              integrity
-                ? "Registro íntegro"
-                : "ALTERAÇÃO DETECTADA"
-            }
-
-          </p>
-
-        `
-
-      } catch(err){
-
-        console.error(err)
-      }
-    }
-
-  </script>
+  <script src="main.js"></script>
 
 </body>
 
