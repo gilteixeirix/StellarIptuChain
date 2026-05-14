@@ -156,32 +156,31 @@
 
     StellarSdk.Networks.TESTNET;
 
-    async function connectWallet() {
-      try {
+  async function connectWallet() {
 
-        if (!window.freighterApi) {
-          alert("Instale a carteira Freighter Wallet");
-          return;
-        }
+  try {
 
-        const isAllowed = await window.freighterApi.isAllowed();
-
-        if (!isAllowed) {
-          alert("Permita acesso da Freighter");
-          return;
-        }
-
-        const response = await window.freighterApi.getAddress();
-
-        publicKey = response.address;
-
-        document.getElementById("walletAddress").innerText = publicKey;
-
-      } catch (error) {
-        console.error(error);
-        alert("Erro ao conectar carteira");
-      }
+    if (!window.freighterApi) {
+      alert("Freighter Wallet não encontrada");
+      return;
     }
+
+    const result = await window.freighterApi.getAddress();
+
+    publicKey = result.address;
+
+    document.getElementById("walletAddress").innerText = publicKey;
+
+    alert("Carteira conectada com sucesso!");
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert("Erro ao conectar carteira");
+
+  }
+}
 
     async function anchorHash() {
 
