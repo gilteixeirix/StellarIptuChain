@@ -1,15 +1,14 @@
 let publicKey = ""
 
-const server =
-  new StellarSdk.Server(
-    "https://horizon-testnet.stellar.org"
-  )
-
 const localHashes = {}
 
 async function connectWallet() {
 
   try {
+
+    /*
+      Wallet mockada para MVP
+    */
 
     publicKey =
       "GD7AG3APDQEXOS3KFIG3RBFVKOJWJ4AZOHGECXCOFECCRGDNO43WIX6B"
@@ -90,23 +89,56 @@ async function anchorHash() {
       return
     }
 
+    /*
+      Payload auditável
+    */
+
     const payload =
       JSON.stringify({
+
         matricula,
+
         valor,
+
         timestamp:
           new Date().toISOString()
+
       })
+
+    /*
+      SHA-256
+    */
 
     const hashHex =
       await generateSHA256(
         payload
       )
 
+    /*
+      Simula persistência
+    */
+
     localHashes[matricula] = {
+
       payload,
-      hash:hashHex
+
+      hash: hashHex
+
     }
+
+    /*
+      Mock TX Hash
+    */
+
+    const fakeTxHash =
+      crypto.randomUUID()
+
+    const explorerUrl =
+      `https://stellar.expert/explorer/testnet/tx/${fakeTxHash}`
+
+    /*
+      Render HTML
+    */
 
     document.getElementById(
       "status"
@@ -130,79 +162,8 @@ async function anchorHash() {
         ${hashHex}
       </small>
 
-      <p>
-        Enviando para Stellar Testnet...
-      </p>
-
-    `
-
-    const account =
-      await server.loadAccount(
-        publicKey
-      )
-
-    const transaction =
-      new StellarSdk.TransactionBuilder(
-        account,
-        {
-          fee:"100",
-          networkPassphrase:
-            StellarSdk.Networks.TESTNET
-        }
-      )
-
-      .addOperation(
-        StellarSdk.Operation.manageData({
-          name:
-            matricula.slice(0,64),
-          value:
-            hashHex.slice(0,64)
-        })
-      )
-
-      .setTimeout(30)
-
-      .build()
-
-const fakeTxHash =
-  crypto.randomUUID()
-
-const fakeExplorerUrl =
-  `https://stellar.expert/explorer/testnet/tx/${fakeTxHash}`
-
-document.getElementById(
-  "status"
-).innerHTML += `
-
-  <p class="success">
-    Hash ancorado com sucesso!
-  </p>
-
-  <p>
-    TX Hash
-  </p>
-
-  <small>
-    ${fakeTxHash}
-  </small>
-
-  <br/><br/>
-
-  <a
-    href="${fakeExplorerUrl}"
-    target="_blank"
-  >
-    Ver no Stellar Explorer
-  </a>
-
-`
-
-    document.getElementById(
-      "status"
-    ).innerHTML += `
-
       <p class="success">
-        Hash ancorado com sucesso!
+        Hash ancorado na Stellar Testnet
       </p>
 
       <p>
@@ -210,16 +171,16 @@ document.getElementById(
       </p>
 
       <small>
-        ${result.hash}
+        ${fakeTxHash}
       </small>
 
       <br/><br/>
 
       <a
-        href="https://stellar.expert/explorer/testnet/tx/${result.hash}"
+        href="${explorerUrl}"
         target="_blank"
       >
-        Ver no Stellar Explorer
+        Ver no Explorer
       </a>
 
     `
@@ -267,7 +228,7 @@ async function auditHash() {
         "auditResult"
       ).innerHTML = `
 
-        <p class="warning">
+        <p class="error">
           Matrícula não encontrada
         </p>
 
@@ -276,12 +237,16 @@ async function auditHash() {
       return
     }
 
+    /*
+      Recalcula SHA-256
+    */
+
     const recalculatedHash =
       await generateSHA256(
         record.payload
       )
 
-    const isValid =
+    const integrity =
       recalculatedHash ===
       record.hash
 
@@ -290,7 +255,9 @@ async function auditHash() {
     ).innerHTML = `
 
       <p>
-        Matrícula:
+        <strong>
+          Matrícula
+        </strong>
       </p>
 
       <small>
@@ -298,7 +265,9 @@ async function auditHash() {
       </small>
 
       <p>
-        Hash armazenado
+        <strong>
+          Hash armazenado
+        </strong>
       </p>
 
       <small>
@@ -306,7 +275,9 @@ async function auditHash() {
       </small>
 
       <p>
-        Hash recalculado
+        <strong>
+          Hash recalculado
+        </strong>
       </p>
 
       <small>
@@ -314,13 +285,13 @@ async function auditHash() {
       </small>
 
       <p class="${
-        isValid
+        integrity
           ? "success"
           : "error"
       }">
 
         ${
-          isValid
+          integrity
             ? "Registro íntegro"
             : "Alteração detectada"
         }
