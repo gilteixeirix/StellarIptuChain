@@ -225,7 +225,7 @@ async function auditHash() {
     if (!matricula) {
 
       alert(
-        "Informe a matrícula"
+        "Digite a matrícula"
       )
 
       return
@@ -250,50 +250,24 @@ async function auditHash() {
     }
 
     /*
-      Simulação de alteração fraudulenta
-    */
-
-    const payloadAtual =
-      JSON.stringify({
-
-        matricula,
-
-        valor:"999999.99",
-
-        timestamp:
-          new Date().toISOString()
-
-      })
-
-    /*
-      Recalcula SHA-256
+      Usa payload ORIGINAL
     */
 
     const recalculatedHash =
       await generateSHA256(
-        payloadAtual
+        record.payload
       )
-
-    /*
-      Verifica integridade
-    */
 
     const integrity =
       recalculatedHash ===
       record.hash
-
-    /*
-      Render auditoria
-    */
 
     document.getElementById(
       "auditResult"
     ).innerHTML = `
 
       <p>
-        <strong>
-          Payload Original
-        </strong>
+        Payload
       </p>
 
       <small>
@@ -301,19 +275,7 @@ async function auditHash() {
       </small>
 
       <p>
-        <strong>
-          Payload Atual
-        </strong>
-      </p>
-
-      <small>
-        ${payloadAtual}
-      </small>
-
-      <p>
-        <strong>
-          Hash Original
-        </strong>
+        Hash Original
       </p>
 
       <small>
@@ -321,9 +283,7 @@ async function auditHash() {
       </small>
 
       <p>
-        <strong>
-          Hash Recalculado
-        </strong>
+        Hash Recalculado
       </p>
 
       <small>
@@ -349,15 +309,5 @@ async function auditHash() {
   } catch(err){
 
     console.error(err)
-
-    document.getElementById(
-      "auditResult"
-    ).innerHTML = `
-
-      <p class="error">
-        ${err.message}
-      </p>
-
-    `
   }
 }
