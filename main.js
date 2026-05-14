@@ -4,29 +4,16 @@ const localHashes = {}
 
 async function connectWallet() {
 
-  try {
+  publicKey =
+    "GD7AG3APDQEXOS3KFIG3RBFVKOJWJ4AZOHGECXCOFECCRGDNO43WIX6B"
 
-    /*
-      Wallet mockada para MVP
-    */
+  document.getElementById(
+    "walletAddress"
+  ).innerText = publicKey
 
-    publicKey =
-      "GD7AG3APDQEXOS3KFIG3RBFVKOJWJ4AZOHGECXCOFECCRGDNO43WIX6B"
-
-    document.getElementById(
-      "walletAddress"
-    ).innerText = publicKey
-
-    alert(
-      "Carteira mock conectada!"
-    )
-
-  } catch(err){
-
-    console.error(err)
-
-    alert(err.message)
-  }
+  alert(
+    "Carteira mock conectada!"
+  )
 }
 
 async function generateSHA256(payload) {
@@ -64,7 +51,7 @@ async function anchorHash() {
     if (!publicKey) {
 
       alert(
-        "Conecte a carteira primeiro"
+        "Conecte a carteira"
       )
 
       return
@@ -89,10 +76,6 @@ async function anchorHash() {
       return
     }
 
-    /*
-      Payload auditável
-    */
-
     const payload =
       JSON.stringify({
 
@@ -105,18 +88,10 @@ async function anchorHash() {
 
       })
 
-    /*
-      SHA-256
-    */
-
     const hashHex =
       await generateSHA256(
         payload
       )
-
-    /*
-      Simula persistência
-    */
 
     localHashes[matricula] = {
 
@@ -126,19 +101,8 @@ async function anchorHash() {
 
     }
 
-    /*
-      Mock TX Hash
-    */
-
     const fakeTxHash =
       crypto.randomUUID()
-
-    const explorerUrl =
-      `https://stellar.expert/explorer/testnet/tx/${fakeTxHash}`
-
-    /*
-      Render HTML
-    */
 
     document.getElementById(
       "status"
@@ -146,7 +110,7 @@ async function anchorHash() {
 
       <p>
         <strong>
-          Payload Auditado
+          Payload
         </strong>
       </p>
 
@@ -155,7 +119,7 @@ async function anchorHash() {
       </small>
 
       <p class="success">
-        SHA-256 Gerado
+        SHA-256
       </p>
 
       <small>
@@ -166,10 +130,6 @@ async function anchorHash() {
         Hash ancorado na Stellar Testnet
       </p>
 
-      <p>
-        TX Hash
-      </p>
-
       <small>
         ${fakeTxHash}
       </small>
@@ -177,10 +137,10 @@ async function anchorHash() {
       <br/><br/>
 
       <a
-        href="${explorerUrl}"
+        href="https://stellar.expert/explorer/testnet/tx/${fakeTxHash}"
         target="_blank"
       >
-        Ver no Explorer
+        Ver Explorer
       </a>
 
     `
@@ -210,15 +170,6 @@ async function auditHash() {
         "consultaMatricula"
       ).value
 
-    if (!matricula) {
-
-      alert(
-        "Informe a matrícula"
-      )
-
-      return
-    }
-
     const record =
       localHashes[matricula]
 
@@ -237,10 +188,6 @@ async function auditHash() {
       return
     }
 
-    /*
-      Recalcula SHA-256
-    */
-
     const recalculatedHash =
       await generateSHA256(
         record.payload
@@ -255,9 +202,7 @@ async function auditHash() {
     ).innerHTML = `
 
       <p>
-        <strong>
-          Matrícula
-        </strong>
+        Matrícula
       </p>
 
       <small>
@@ -265,9 +210,7 @@ async function auditHash() {
       </small>
 
       <p>
-        <strong>
-          Hash armazenado
-        </strong>
+        Hash armazenado
       </p>
 
       <small>
@@ -275,9 +218,7 @@ async function auditHash() {
       </small>
 
       <p>
-        <strong>
-          Hash recalculado
-        </strong>
+        Hash recalculado
       </p>
 
       <small>
@@ -303,15 +244,5 @@ async function auditHash() {
   } catch(err){
 
     console.error(err)
-
-    document.getElementById(
-      "auditResult"
-    ).innerHTML = `
-
-      <p class="error">
-        ${err.message}
-      </p>
-
-    `
   }
 }
