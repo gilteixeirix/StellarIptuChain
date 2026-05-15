@@ -1,6 +1,14 @@
 import * as StellarSdk
 from "https://esm.sh/@stellar/stellar-sdk"
 
+import {
+  isConnected,
+  requestAccess,
+  getAddress,
+  signTransaction
+}
+from "https://esm.sh/@stellar/freighter-api"
+
 const server =
   new StellarSdk.Horizon.Server(
     "https://horizon-testnet.stellar.org"
@@ -50,12 +58,27 @@ async function connectWallet(){
 
   try{
 
-    /*
-      MOCK TEMPORÁRIO
-    */
+    const connected =
+      await isConnected()
+
+    if(
+      !connected.isConnected
+    ){
+
+      alert(
+        "Freighter não encontrada"
+      )
+
+      return
+    }
+
+    await requestAccess()
+
+    const addressObj =
+      await getAddress()
 
     publicKey =
-      "GD7AG3APDQEXOS3KFIG3RBFVKOJWJ4AZOHGECXCOFECCRGDNO43WIX6B"
+      addressObj.address
 
     document.getElementById(
       "walletAddress"
@@ -114,6 +137,10 @@ async function anchorHash(){
 
       })
 
+    /*
+      SHA-256
+    */
+
     const hashHex =
       await generateSHA256(
         payload
@@ -128,16 +155,91 @@ async function anchorHash(){
     }
 
     /*
-      HASH REALISTA
+      ACCOUNT
     */
 
-    const txHash =
-      await generateSHA256(
-        hashHex + Date.now()
+    const account =
+      await server.loadAccount(
+        publicKey
       )
 
+    /*
+      TX
+    */
+
+    const tx =
+      new StellarSdk.TransactionBuilder(
+        account,
+        {
+          fee:
+            StellarSdk.BASE_FEE,
+
+          networkPassphrase:
+            StellarSdk.Networks.TESTNET
+        }
+      )
+
+      .addOperation(
+
+        StellarSdk.Operation.manageData({
+
+          name:
+            matricula.slice(0,64),
+
+          value:
+            hashHex.slice(0,64)
+
+        })
+
+      )
+
+      .setTimeout(30)
+
+      .build()
+
+    /*
+      SIGN REAL
+    */
+
+    const signed =
+      await signTransaction(
+        tx.toXDR(),
+        {
+          networkPassphrase:
+            StellarSdk.Networks.TESTNET
+        }
+      )
+
+    /*
+      REBUILD
+    */
+
+    const signedTx =
+      StellarSdk.TransactionBuilder
+        .fromXDR(
+          signed.signedTxXdr,
+          StellarSdk.Networks.TESTNET
+        )
+
+    /*
+      SUBMIT REAL
+    */
+
+    const result =
+      await server.submitTransaction(
+        signedTx
+      )
+
+    /*
+      EXPLORER REAL
+    */
+
     const explorerUrl =
-      `https://stellar.expert/explorer/testnet/tx/${txHash}`
+      `https://stellar.expert/explorer/testnet/tx/${result.hash}`
+
+    /*
+      RENDER
+    */
 
     document.getElementById(
       "status"
@@ -147,12 +249,20 @@ async function anchorHash(){
         Hash ancorado!
       </p>
 
+      <p>
+        SHA-256
+      </p>
+
       <small>
         ${hashHex}
       </small>
 
+      <p>
+        TX Hash REAL
+      </p>
+
       <small>
-        ${txHash}
+        ${result.hash}
       </small>
 
       <br><br>
@@ -169,6 +279,16 @@ async function anchorHash(){
   } catch(err){
 
     console.error(err)
+
+    document.getElementById(
+      "status"
+    ).innerHTML = `
+
+      <p class="error">
+        ${err.message}
+      </p>
+
+    `
   }
 }
 
