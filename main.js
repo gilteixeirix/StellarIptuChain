@@ -340,7 +340,7 @@ window.anchorHash =
     } catch(err){
 
       console.error(err)
-
+console.log("RESULT", result)
       document.getElementById(
         "status"
       ).innerHTML = `
