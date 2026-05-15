@@ -221,15 +221,15 @@ import {
   BASE_FEE,
   Operation
 }
-from "https://esm.sh/@stellar/stellar-sdk"
+from "https://cdn.jsdelivr.net/npm/@stellar/stellar-sdk/+esm"
 
-    import {
-      isConnected,
-      requestAccess,
-      getAddress,
-      signTransaction
-    }
-    from "https://esm.sh/@stellar/freighter-api"
+import {
+  isConnected,
+  requestAccess,
+  getAddress,
+  signTransaction
+}
+from "https://cdn.jsdelivr.net/npm/@stellar/freighter-api/+esm"
 
 const server =
  new Horizon.Server(
