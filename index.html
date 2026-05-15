@@ -438,7 +438,7 @@ const server =
               tx.toXDR(),
               {
                 networkPassphrase:
-                  StellarSdk.Networks.TESTNET
+                  Networks.TESTNET
               }
             )
 
@@ -447,10 +447,10 @@ const server =
           */
 
           const signedTx =
-            StellarSdk.TransactionBuilder
+            TransactionBuilder
               .fromXDR(
                 signed.signedTxXdr,
-                StellarSdk.Networks.TESTNET
+                Networks.TESTNET
               )
 
           /*
