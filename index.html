@@ -215,7 +215,7 @@
   <script type="module">
 
 import {
-  Server,
+  Horizon,
   TransactionBuilder,
   Networks,
   BASE_FEE,
@@ -232,7 +232,7 @@ from "https://esm.sh/@stellar/stellar-sdk"
     from "https://esm.sh/@stellar/freighter-api"
 
 const server =
-  new Server(
+ new Horizon.Server(
     "https://horizon-testnet.stellar.org"
   )
 
