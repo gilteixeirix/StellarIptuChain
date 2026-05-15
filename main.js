@@ -1,5 +1,11 @@
-import * as StellarSdk
-from "https://esm.sh/@stellar/stellar-sdk"
+import {
+  Server,
+  TransactionBuilder,
+  Networks,
+  BASE_FEE,
+  Operation
+}
+from "https://esm.sh/stellar-sdk"
 
 import {
   isConnected,
@@ -10,7 +16,7 @@ import {
 from "https://esm.sh/@stellar/freighter-api"
 
 const server =
-  new StellarSdk.Horizon.Server(
+  new Server(
     "https://horizon-testnet.stellar.org"
   )
 
@@ -216,20 +222,20 @@ async function anchorHash(){
     */
 
     const tx =
-      new StellarSdk.TransactionBuilder(
+      new TransactionBuilder(
         account,
         {
           fee:
-            StellarSdk.BASE_FEE,
+            BASE_FEE,
 
           networkPassphrase:
-            StellarSdk.Networks.TESTNET
+            Networks.TESTNET
         }
       )
 
       .addOperation(
 
-        StellarSdk.Operation.manageData({
+        Operation.manageData({
 
           name:
             matricula.slice(0,64),
