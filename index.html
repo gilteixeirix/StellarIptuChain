@@ -3,604 +3,494 @@
 
 <head>
 
-  <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
 
-  <title>
-    IPTU Chain
-  </title>
+<title>IPTU Chain</title>
 
-  <style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stellar-sdk/10.4.1/stellar-sdk.min.js"></script>
 
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      font-family:Arial,sans-serif;
-    }
+<style>
 
-    body{
-      background:#0f172a;
-      color:white;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      min-height:100vh;
-      padding:20px;
-    }
+body{
+  background:#0f172a;
+  color:white;
+  font-family:Arial;
+  padding:20px;
+}
 
-    .container{
-      width:100%;
-      max-width:700px;
-      background:#1e293b;
-      padding:30px;
-      border-radius:20px;
-    }
+.container{
+  max-width:700px;
+  margin:auto;
+  background:#1e293b;
+  padding:30px;
+  border-radius:20px;
+}
 
-    h1{
-      text-align:center;
-      color:#38bdf8;
-      margin-bottom:10px;
-    }
+.card{
+  background:#334155;
+  padding:20px;
+  border-radius:15px;
+  margin-top:20px;
+}
 
-    .card{
-      background:#334155;
-      padding:15px;
-      border-radius:12px;
-      margin-top:20px;
-    }
+input{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  margin-bottom:10px;
+  border:none;
+  border-radius:10px;
+  background:#0f172a;
+  color:white;
+}
 
-    input{
-      width:100%;
-      padding:12px;
-      border:none;
-      border-radius:10px;
-      margin-top:10px;
-      margin-bottom:10px;
-      background:#0f172a;
-      color:white;
-    }
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:10px;
+  margin-top:10px;
+  cursor:pointer;
+  font-weight:bold;
+}
 
-    button{
-      width:100%;
-      padding:14px;
-      border:none;
-      border-radius:12px;
-      cursor:pointer;
-      font-weight:bold;
-      margin-top:10px;
-    }
+.connect{
+  background:#38bdf8;
+}
 
-    .connect-btn{
-      background:#38bdf8;
-      color:black;
-    }
+.anchor{
+  background:#22c55e;
+  color:white;
+}
 
-    .anchor-btn{
-      background:#22c55e;
-      color:white;
-    }
+.audit{
+  background:#f59e0b;
+  color:white;
+}
 
-    .audit-btn{
-      background:#f59e0b;
-      color:white;
-    }
+small{
+  display:block;
+  margin-top:10px;
+  word-break:break-all;
+}
 
-    small{
-      display:block;
-      margin-top:10px;
-      background:#0f172a;
-      padding:10px;
-      border-radius:10px;
-      word-break:break-all;
-    }
+.success{
+  color:#22c55e;
+}
 
-    .success{
-      color:#22c55e;
-      margin-top:10px;
-    }
+.error{
+  color:#ef4444;
+}
 
-    .error{
-      color:#ef4444;
-      margin-top:10px;
-    }
+a{
+  color:#38bdf8;
+}
 
-    a{
-      color:#38bdf8;
-    }
-
-  </style>
+</style>
 
 </head>
 
 <body>
 
-  <div class="container">
+<div class="container">
 
-    <h1>
-      IPTU Chain
-    </h1>
+<h1>IPTU Chain</h1>
 
-    <p>
-      Auditoria Fiscal Blockchain Stellar
-    </p>
+<p>
+Auditoria Fiscal Blockchain Stellar
+</p>
 
-    <button
-      class="connect-btn"
-      onclick="connectWallet()"
-    >
-      Conectar Freighter
-    </button>
+<button
+  class="connect"
+  onclick="connectWallet()"
+>
+Conectar Freighter
+</button>
 
-    <div class="card">
+<div class="card">
 
-      <strong>
-        Carteira
-      </strong>
+<strong>Carteira</strong>
 
-      <small id="walletAddress">
-        Não conectada
-      </small>
+<small id="wallet">
+Não conectada
+</small>
 
-    </div>
+</div>
 
-    <div class="card">
+<div class="card">
 
-      <strong>
-        Matrícula
-      </strong>
+<input
+  id="matricula"
+  placeholder="Matrícula IPTU"
+>
 
-      <input
-        type="text"
-        id="matricula"
-        placeholder="IPTU-2026-0001"
-      >
+<input
+  id="valor"
+  placeholder="Valor IPTU"
+>
 
-      <strong>
-        Valor IPTU
-      </strong>
+<button
+  class="anchor"
+  onclick="anchorHash()"
+>
+Gerar SHA-256 + Ancorar
+</button>
 
-      <input
-        type="text"
-        id="valor"
-        placeholder="1500.00"
-      >
+<div id="status"></div>
 
-      <button
-        class="anchor-btn"
-        onclick="anchorHash()"
-      >
-        Gerar SHA-256 + Ancorar
-      </button>
+</div>
 
-      <div id="status"></div>
+<div class="card">
 
-    </div>
+<input
+  id="consultaMatricula"
+  placeholder="Matrícula"
+>
 
-    <div class="card">
+<input
+  id="consultaValor"
+  placeholder="Valor Atual"
+>
 
-      <strong>
-        Auditoria
-      </strong>
+<button
+  class="audit"
+  onclick="auditHash()"
+>
+Auditar
+</button>
 
-      <input
-        type="text"
-        id="consultaMatricula"
-        placeholder="Matrícula"
-      >
+<div id="auditResult"></div>
 
-      <input
-        type="text"
-        id="consultaValor"
-        placeholder="Valor Atual"
-      >
+</div>
 
-      <button
-        class="audit-btn"
-        onclick="auditHash()"
-      >
-        Auditar
-      </button>
+</div>
 
-      <div id="auditResult"></div>
+<script>
 
-    </div>
-
-  </div>
-
-  <script type="module">
-
-import {
-  Horizon,
-  TransactionBuilder,
-  Networks,
-  BASE_FEE,
-  Operation
-}
-from "https://cdn.jsdelivr.net/npm/@stellar/stellar-sdk/+esm"
-
-import {
-  isConnected,
-  requestAccess,
-  getAddress,
-  signTransaction
-}
-from "https://cdn.jsdelivr.net/npm/@stellar/freighter-api/+esm"
+console.log("SCRIPT CARREGADO")
 
 const server =
- new Horizon.Server(
+  new StellarSdk.Server(
     "https://horizon-testnet.stellar.org"
   )
 
-    let publicKey = ""
+let publicKey = ""
 
-    const localHashes = {}
+const localHashes = {}
 
-    /*
-      SHA-256
-    */
+async function sha256(message){
 
-    async function generateSHA256(payload){
+  const msgBuffer =
+    new TextEncoder().encode(message)
 
-      const encoder =
-        new TextEncoder()
+  const hashBuffer =
+    await crypto.subtle.digest(
+      "SHA-256",
+      msgBuffer
+    )
 
-      const data =
-        encoder.encode(payload)
+  const hashArray =
+    Array.from(
+      new Uint8Array(hashBuffer)
+    )
 
-      const hashBuffer =
-        await crypto.subtle.digest(
-          "SHA-256",
-          data
-        )
+  return hashArray
+    .map(
+      b =>
+        b.toString(16)
+         .padStart(2,"0")
+    )
+    .join("")
+}
 
-      const hashArray =
-        Array.from(
-          new Uint8Array(hashBuffer)
-        )
+/*
+  CONNECT
+*/
 
-      return hashArray
-        .map(
-          b =>
-            b.toString(16)
-             .padStart(2,"0")
-        )
-        .join("")
+async function connectWallet(){
+
+  try{
+
+    console.log("CONNECT")
+
+    if(
+      !window.freighterApi
+    ){
+
+      alert(
+        "Freighter não encontrada"
+      )
+
+      return
     }
 
-    /*
-      CONNECT
-    */
+    const result =
+      await window.freighterApi
+        .getPublicKey()
 
-    window.connectWallet =
-      async function(){
+    publicKey =
+      result
 
-        try{
-
-          const connected =
-            await isConnected()
-
-          if(
-            !connected.isConnected
-          ){
-
-            alert(
-              "Freighter não encontrada"
-            )
-
-            return
-          }
-
-          await requestAccess()
-
-          const addressObj =
-            await getAddress()
-
-          publicKey =
-            addressObj.address
-
-          /*
-            TESTE REAL
-          */
-
-          await server.loadAccount(
-            publicKey
-          )
-
-          document.getElementById(
-            "walletAddress"
-          ).innerText =
-            publicKey
-
-          alert(
-            "Wallet REAL conectada!"
-          )
-
-        } catch(err){
-
-          console.error(err)
-
-          alert(err.message)
-        }
-      }
+    document.getElementById(
+      "wallet"
+    ).innerText =
+      publicKey
 
     /*
-      ANCHOR
+      TESTE REAL
     */
 
-    window.anchorHash =
-      async function(){
+    const account =
+      await server.loadAccount(
+        publicKey
+      )
 
-        try{
+    console.log(account)
 
-          if(!publicKey){
+    alert(
+      "Wallet REAL conectada"
+    )
 
-            alert(
-              "Conecte a wallet"
-            )
+  } catch(err){
 
-            return
-          }
+    console.error(err)
 
-          const matricula =
-            document.getElementById(
-              "matricula"
-            ).value
+    alert(err.message)
+  }
+}
 
-          const valor =
-            document.getElementById(
-              "valor"
-            ).value
+/*
+  ANCHOR
+*/
 
-          const payload =
-            JSON.stringify({
+async function anchorHash(){
 
-              matricula,
+  try{
 
-              valor,
+    console.log("ANCHOR")
 
-              timestamp:
-                new Date()
-                  .toISOString()
+    if(!publicKey){
 
-            })
+      alert(
+        "Conecte a wallet"
+      )
 
-          /*
-            SHA
-          */
+      return
+    }
 
-          const hashHex =
-            await generateSHA256(
-              payload
-            )
+    const matricula =
+      document.getElementById(
+        "matricula"
+      ).value
 
-          localHashes[matricula] = {
+    const valor =
+      document.getElementById(
+        "valor"
+      ).value
 
-            payload,
+    const payload =
+      JSON.stringify({
 
-            hash: hashHex
+        matricula,
+        valor,
+        timestamp:
+          new Date()
+            .toISOString()
 
-          }
+      })
 
-          /*
-            ACCOUNT
-          */
+    const hash =
+      await sha256(payload)
 
-          const account =
-            await server.loadAccount(
-              publicKey
-            )
+    localHashes[matricula] = {
+      payload,
+      hash
+    }
 
-          /*
-            TX
-          */
+    const account =
+      await server.loadAccount(
+        publicKey
+      )
 
-          const tx =
-            new TransactionBuilder(
-              account,
-              {
-                fee:
-                  BASE_FEE,
+    const tx =
+      new StellarSdk.TransactionBuilder(
+        account,
+        {
+          fee:
+            StellarSdk.BASE_FEE,
 
-                networkPassphrase:
-                  Networks.TESTNET
-              }
-            )
-
-            .addOperation(
-
-              Operation.manageData({
-
-                name:
-                  matricula.slice(0,64),
-
-                value:
-                  hashHex.slice(0,64)
-
-              })
-
-            )
-
-            .setTimeout(30)
-
-            .build()
-
-          /*
-            SIGN
-          */
-
-          const signed =
-            await signTransaction(
-              tx.toXDR(),
-              {
-                networkPassphrase:
-                  Networks.TESTNET
-              }
-            )
-
-          /*
-            REBUILD
-          */
-
-          const signedTx =
-            TransactionBuilder
-              .fromXDR(
-                signed.signedTxXdr,
-                Networks.TESTNET
-              )
-
-          /*
-            SUBMIT REAL
-          */
-
-          const result =
-            await server.submitTransaction(
-              signedTx
-            )
-
-          console.log(result)
-
-          const explorerUrl =
-            `https://stellar.expert/explorer/testnet/tx/${result.hash}`
-
-          document.getElementById(
-            "status"
-          ).innerHTML = `
-
-            <p class="success">
-              Hash ancorado!
-            </p>
-
-            <small>
-              ${hashHex}
-            </small>
-
-            <small>
-              ${result.hash}
-            </small>
-
-            <br><br>
-
-            <a
-              href="${explorerUrl}"
-              target="_blank"
-            >
-              Ver Explorer
-            </a>
-
-          `
-
-        } catch(err){
-
-          console.error(err)
-
-          document.getElementById(
-            "status"
-          ).innerHTML = `
-
-            <p class="error">
-              ${err.message}
-            </p>
-
-          `
+          networkPassphrase:
+            StellarSdk.Networks.TESTNET
         }
-      }
+      )
+
+      .addOperation(
+
+        StellarSdk.Operation.manageData({
+
+          name:
+            matricula,
+
+          value:
+            hash.slice(0,64)
+
+        })
+
+      )
+
+      .setTimeout(30)
+
+      .build()
 
     /*
-      AUDITORIA
+      SIGN REAL
     */
 
-    window.auditHash =
-      async function(){
+    const signedXDR =
+      await window.freighterApi
+        .signTransaction(
+          tx.toXDR(),
+          "TESTNET"
+        )
 
-        try{
+    const signedTx =
+      StellarSdk.TransactionBuilder
+        .fromXDR(
+          signedXDR,
+          StellarSdk.Networks.TESTNET
+        )
 
-          const matricula =
-            document.getElementById(
-              "consultaMatricula"
-            ).value
+    /*
+      SUBMIT REAL
+    */
 
-          const valorAtual =
-            document.getElementById(
-              "consultaValor"
-            ).value
+    const result =
+      await server.submitTransaction(
+        signedTx
+      )
 
-          const record =
-            localHashes[matricula]
+    console.log(result)
 
-          if(!record){
+    const explorer =
+      `https://stellar.expert/explorer/testnet/tx/${result.hash}`
 
-            document.getElementById(
-              "auditResult"
-            ).innerHTML = `
+    document.getElementById(
+      "status"
+    ).innerHTML = `
 
-              <p class="error">
-                Matrícula não encontrada
-              </p>
+      <p class="success">
+        Hash ancorado!
+      </p>
 
-            `
+      <small>
+        ${hash}
+      </small>
 
-            return
-          }
+      <small>
+        ${result.hash}
+      </small>
 
-          const originalData =
-            JSON.parse(
-              record.payload
-            )
+      <a
+        href="${explorer}"
+        target="_blank"
+      >
+        Ver Explorer
+      </a>
 
-          const payloadAtual =
-            JSON.stringify({
+    `
 
-              matricula,
+  } catch(err){
 
-              valor:
-                valorAtual,
+    console.error(err)
 
-              timestamp:
-                originalData.timestamp
+    document.getElementById(
+      "status"
+    ).innerHTML = `
 
-            })
+      <p class="error">
+        ${err.message}
+      </p>
 
-          const recalculatedHash =
-            await generateSHA256(
-              payloadAtual
-            )
+    `
+  }
+}
 
-          const integrity =
-            recalculatedHash ===
-            record.hash
+/*
+  AUDITORIA
+*/
 
-          document.getElementById(
-            "auditResult"
-          ).innerHTML = `
+async function auditHash(){
 
-            <p class="${
-              integrity
-                ? "success"
-                : "error"
-            }">
+  const matricula =
+    document.getElementById(
+      "consultaMatricula"
+    ).value
 
-              ${
-                integrity
-                  ? "Registro íntegro"
-                  : "ALTERAÇÃO DETECTADA"
-              }
+  const valor =
+    document.getElementById(
+      "consultaValor"
+    ).value
 
-            </p>
+  const record =
+    localHashes[matricula]
 
-          `
+  if(!record){
 
-        } catch(err){
+    document.getElementById(
+      "auditResult"
+    ).innerHTML =
+      "<p class='error'>Matrícula não encontrada</p>"
 
-          console.error(err)
-        }
+    return
+  }
+
+  const original =
+    JSON.parse(record.payload)
+
+  const payloadAtual =
+    JSON.stringify({
+
+      matricula,
+      valor,
+      timestamp:
+        original.timestamp
+
+    })
+
+  const hashAtual =
+    await sha256(payloadAtual)
+
+  const integrity =
+    hashAtual ===
+    record.hash
+
+  document.getElementById(
+    "auditResult"
+  ).innerHTML = `
+
+    <p class="${
+      integrity
+        ? "success"
+        : "error"
+    }">
+
+      ${
+        integrity
+          ? "Registro íntegro"
+          : "ALTERAÇÃO DETECTADA"
       }
 
-  </script>
+    </p>
+
+  `
+}
+
+</script>
 
 </body>
 
