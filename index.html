@@ -14,10 +14,113 @@
     IPTU Chain
   </title>
 
-  <link
-    rel="stylesheet"
-    href="style.css"
-  >
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial,sans-serif;
+    }
+
+    body{
+      background:#0f172a;
+      color:white;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height:100vh;
+      padding:20px;
+    }
+
+    .container{
+      width:100%;
+      max-width:700px;
+      background:#1e293b;
+      padding:30px;
+      border-radius:20px;
+      box-shadow:0 0 30px rgba(0,0,0,.4);
+    }
+
+    h1{
+      text-align:center;
+      color:#38bdf8;
+      margin-bottom:10px;
+    }
+
+    p{
+      text-align:center;
+      margin-bottom:20px;
+      color:#cbd5e1;
+    }
+
+    .card{
+      background:#334155;
+      padding:15px;
+      border-radius:12px;
+      margin-top:20px;
+    }
+
+    input{
+      width:100%;
+      padding:12px;
+      border:none;
+      border-radius:10px;
+      margin-top:10px;
+      margin-bottom:10px;
+      background:#0f172a;
+      color:white;
+    }
+
+    button{
+      width:100%;
+      padding:14px;
+      border:none;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:bold;
+      margin-top:10px;
+    }
+
+    .connect-btn{
+      background:#38bdf8;
+      color:black;
+    }
+
+    .anchor-btn{
+      background:#22c55e;
+      color:white;
+    }
+
+    .audit-btn{
+      background:#f59e0b;
+      color:white;
+    }
+
+    small{
+      display:block;
+      margin-top:10px;
+      background:#0f172a;
+      padding:10px;
+      border-radius:10px;
+      word-break:break-all;
+    }
+
+    .success{
+      color:#22c55e;
+      margin-top:10px;
+    }
+
+    .error{
+      color:#ef4444;
+      margin-top:10px;
+    }
+
+    a{
+      color:#38bdf8;
+    }
+
+  </style>
 
 </head>
 
@@ -30,7 +133,7 @@
     </h1>
 
     <p>
-      Auditoria Fiscal com Blockchain Stellar
+      Auditoria Fiscal Blockchain Stellar
     </p>
 
     <!-- WALLET -->
@@ -39,13 +142,13 @@
       class="connect-btn"
       onclick="connectWallet()"
     >
-      Conectar Carteira
+      Conectar Wallet Stellar
     </button>
 
     <div class="card">
 
       <strong>
-        Carteira Conectada
+        Carteira
       </strong>
 
       <small id="walletAddress">
@@ -126,7 +229,10 @@
 
   </div>
 
-  <script src="main.js"></script>
+  <script
+    type="module"
+    src="./main.js?v=7"
+  ></script>
 
 </body>
 
