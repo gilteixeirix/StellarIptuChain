@@ -117,7 +117,7 @@ window.connectWallet =
     } catch(err){
 
       console.error(err)
-      console.log("RESULT", result)
+
       alert(err.message)
     }
 }
@@ -340,7 +340,7 @@ window.anchorHash =
     } catch(err){
 
       console.error(err)
-      console.log("RESULT", result)
+  
       document.getElementById(
         "status"
       ).innerHTML = `
@@ -469,8 +469,17 @@ window.auditHash =
 
       `
 
-    } catch(err){
-    console.log("RESULT", result)
-      console.error(err)
-    }
+} catch(err){
+
+  console.error(err)
+
+  document.getElementById(
+    "status"
+  ).innerHTML = `
+
+    <p class="error">
+      ${err.message}
+    </p>
+
+  `
 }
