@@ -1,3 +1,7 @@
+/*
+  IMPORTS
+*/
+
 import * as StellarSdk
 from "https://esm.sh/@stellar/stellar-sdk"
 
@@ -6,10 +10,11 @@ import {
   WalletNetwork,
   FREIGHTER_ID,
   allowAllModules
-} from "https://esm.sh/@creit.tech/stellar-wallets-kit"
+}
+from "https://esm.sh/@creit.tech/stellar-wallets-kit"
 
 /*
-  Stellar Kit
+  STELLAR KIT
 */
 
 const kit =
@@ -27,7 +32,7 @@ const kit =
   })
 
 /*
-  Horizon
+  HORIZON
 */
 
 const server =
@@ -36,13 +41,13 @@ const server =
   )
 
 /*
-  Wallet
+  WALLET
 */
 
 let publicKey = ""
 
 /*
-  Cache auditoria
+  CACHE
 */
 
 const localHashes = {}
@@ -93,24 +98,37 @@ window.connectWallet =
         onWalletSelected:
           async option => {
 
-            kit.setWallet(option.id)
+            try{
 
-            const {
-              address
-            } =
-              await kit.getAddress()
+              kit.setWallet(
+                option.id
+              )
 
-            publicKey =
-              address
+              const {
+                address
+              } =
+                await kit.getAddress()
 
-            document.getElementById(
-              "walletAddress"
-            ).innerText =
-              publicKey
+              publicKey =
+                address
 
-            alert(
-              "Wallet conectada!"
-            )
+              document.getElementById(
+                "walletAddress"
+              ).innerText =
+                publicKey
+
+              alert(
+                "Wallet conectada!"
+              )
+
+            } catch(innerErr){
+
+              console.error(innerErr)
+
+              alert(
+                innerErr.message
+              )
+            }
           }
       })
 
@@ -160,7 +178,7 @@ window.anchorHash =
       }
 
       /*
-        Payload
+        PAYLOAD
       */
 
       const payload =
@@ -177,7 +195,7 @@ window.anchorHash =
         })
 
       /*
-        SHA-256
+        SHA
       */
 
       const hashHex =
@@ -186,7 +204,7 @@ window.anchorHash =
         )
 
       /*
-        Cache auditoria
+        CACHE
       */
 
       localHashes[matricula] = {
@@ -198,7 +216,7 @@ window.anchorHash =
       }
 
       /*
-        Status parcial
+        STATUS
       */
 
       document.getElementById(
@@ -216,7 +234,7 @@ window.anchorHash =
       `
 
       /*
-        Conta
+        ACCOUNT
       */
 
       const account =
@@ -259,10 +277,12 @@ window.anchorHash =
         .build()
 
       /*
-        Sign
+        SIGN
       */
 
-      const { signedTxXdr } =
+      const {
+        signedTxXdr
+      } =
         await kit.signTransaction(
           tx.toXDR(),
           {
@@ -272,7 +292,7 @@ window.anchorHash =
         )
 
       /*
-        Rebuild TX
+        REBUILD
       */
 
       const signedTx =
@@ -283,23 +303,25 @@ window.anchorHash =
           )
 
       /*
-        Submit
+        REAL SUBMIT
       */
 
       const result =
         await server.submitTransaction(
           signedTx
         )
+
       console.log(result)
+
       /*
-        Explorer
+        EXPLORER
       */
 
       const explorerUrl =
         `https://stellar.expert/explorer/testnet/tx/${result.hash}`
 
       /*
-        Render final
+        RENDER
       */
 
       document.getElementById(
@@ -319,7 +341,7 @@ window.anchorHash =
         </small>
 
         <p>
-          TX Hash
+          TX Hash REAL
         </p>
 
         <small>
@@ -340,7 +362,7 @@ window.anchorHash =
     } catch(err){
 
       console.error(err)
-  
+
       document.getElementById(
         "status"
       ).innerHTML = `
@@ -391,13 +413,17 @@ window.auditHash =
       }
 
       /*
-        Payload atual
+        ORIGINAL
       */
 
       const originalData =
         JSON.parse(
           record.payload
         )
+
+      /*
+        PAYLOAD ATUAL
+      */
 
       const payloadAtual =
         JSON.stringify({
@@ -413,7 +439,7 @@ window.auditHash =
         })
 
       /*
-        Recalcula hash
+        RECALCULA
       */
 
       const recalculatedHash =
@@ -422,7 +448,7 @@ window.auditHash =
         )
 
       /*
-        Integridade
+        INTEGRIDADE
       */
 
       const integrity =
@@ -430,7 +456,7 @@ window.auditHash =
         record.hash
 
       /*
-        Render
+        RENDER
       */
 
       document.getElementById(
@@ -469,17 +495,8 @@ window.auditHash =
 
       `
 
-} catch(err){
+    } catch(err){
 
-  console.error(err)
-
-  document.getElementById(
-    "status"
-  ).innerHTML = `
-
-    <p class="error">
-      ${err.message}
-    </p>
-
-  `
+      console.error(err)
+    }
 }
