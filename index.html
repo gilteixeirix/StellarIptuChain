@@ -10,9 +10,7 @@
     content="width=device-width, initial-scale=1.0"
   />
 
-  <title>
-    IPTU Chain
-  </title>
+  <title>IPTU Chain</title>
 
   <style>
 
@@ -39,7 +37,6 @@
       background:#1e293b;
       padding:30px;
       border-radius:20px;
-      box-shadow:0 0 30px rgba(0,0,0,.4);
     }
 
     h1{
@@ -82,17 +79,17 @@
       margin-top:10px;
     }
 
-    .connect-btn{
+    #connectBtn{
       background:#38bdf8;
       color:black;
     }
 
-    .anchor-btn{
+    #anchorBtn{
       background:#22c55e;
       color:white;
     }
 
-    .audit-btn{
+    #auditBtn{
       background:#f59e0b;
       color:white;
     }
@@ -108,12 +105,10 @@
 
     .success{
       color:#22c55e;
-      margin-top:10px;
     }
 
     .error{
       color:#ef4444;
-      margin-top:10px;
     }
 
     a{
@@ -128,9 +123,7 @@
 
   <div class="container">
 
-    <h1>
-      IPTU Chain
-    </h1>
+    <h1>IPTU Chain</h1>
 
     <p>
       Auditoria Fiscal Blockchain Stellar
@@ -138,18 +131,13 @@
 
     <!-- WALLET -->
 
-    <button
-      class="connect-btn"
-      onclick="connectWallet()"
-    >
+    <button id="connectBtn">
       Conectar Wallet
     </button>
 
     <div class="card">
 
-      <strong>
-        Carteira
-      </strong>
+      <strong>Carteira</strong>
 
       <small id="walletAddress">
         Não conectada
@@ -157,13 +145,11 @@
 
     </div>
 
-    <!-- REGISTRO -->
+    <!-- ANCORAGEM -->
 
     <div class="card">
 
-      <strong>
-        Matrícula
-      </strong>
+      <strong>Matrícula</strong>
 
       <input
         type="text"
@@ -171,9 +157,7 @@
         placeholder="IPTU-2026-0001"
       />
 
-      <strong>
-        Valor IPTU
-      </strong>
+      <strong>Valor</strong>
 
       <input
         type="text"
@@ -181,10 +165,7 @@
         placeholder="1500.00"
       />
 
-      <button
-        class="anchor-btn"
-        onclick="anchorHash()"
-      >
+      <button id="anchorBtn">
         Gerar SHA-256 + Ancorar
       </button>
 
@@ -196,9 +177,7 @@
 
     <div class="card">
 
-      <strong>
-        Auditoria
-      </strong>
+      <strong>Auditoria</strong>
 
       <input
         type="text"
@@ -212,10 +191,7 @@
         placeholder="Valor Atual"
       />
 
-      <button
-        class="audit-btn"
-        onclick="auditHash()"
-      >
+      <button id="auditBtn">
         Auditar
       </button>
 
@@ -225,11 +201,9 @@
 
   </div>
 
-  <!-- MAIN JS -->
-
   <script
     type="module"
-    src="./main.js?v=7"
+    src="./main.js?v=99"
   ></script>
 
 </body>
