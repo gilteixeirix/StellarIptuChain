@@ -290,7 +290,7 @@ window.anchorHash =
         await server.submitTransaction(
           signedTx
         )
-
+      console.log(result)
       /*
         Explorer
       */
