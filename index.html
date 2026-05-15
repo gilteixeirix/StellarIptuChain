@@ -14,119 +14,22 @@
     IPTU Chain
   </title>
 
-  <link
-    rel="stylesheet"
-    href="style.css"
-  >
-
 </head>
 
 <body>
 
-  <div class="container">
+  <button onclick="connectWallet()">
+    Conectar Freighter
+  </button>
 
-    <h1>
-      IPTU Chain
-    </h1>
+  <p id="wallet">
+    Não conectada
+  </p>
 
-    <p>
-      Auditoria Fiscal com Blockchain Stellar
-    </p>
-
-    <!-- WALLET -->
-
-    <button
-      class="connect-btn"
-      onclick="connectWallet()"
-    >
-      Conectar Carteira
-    </button>
-
-    <div class="card">
-
-      <strong>
-        Carteira Conectada
-      </strong>
-
-      <small id="walletAddress">
-        Não conectada
-      </small>
-
-    </div>
-
-    <!-- REGISTRO -->
-
-    <div class="card">
-
-      <strong>
-        Matrícula do Imóvel
-      </strong>
-
-      <input
-        type="text"
-        id="matricula"
-        placeholder="IPTU-2026-0001"
-      >
-
-      <strong>
-        Valor IPTU
-      </strong>
-
-      <input
-        type="text"
-        id="valor"
-        placeholder="1500.00"
-      >
-
-      <button
-        class="anchor-btn"
-        onclick="anchorHash()"
-      >
-        Gerar SHA-256 + Ancorar
-      </button>
-
-      <div id="status"></div>
-
-    </div>
-
-    <!-- AUDITORIA -->
-
-    <div class="card">
-
-      <strong>
-        Auditoria por Matrícula
-      </strong>
-
-      <input
-        type="text"
-        id="consultaMatricula"
-        placeholder="Digite a matrícula"
-      >
-
-      <strong>
-        Valor Atual IPTU
-      </strong>
-
-      <input
-        type="text"
-        id="consultaValor"
-        placeholder="Digite o valor atual"
-      >
-
-      <button
-        class="audit-btn"
-        onclick="auditHash()"
-      >
-        Auditar Registro
-      </button>
-
-      <div id="auditResult"></div>
-
-    </div>
-
-  </div>
-
-  <script src="main.js"></script>
+  <script
+    type="module"
+    src="./main.js"
+  ></script>
 
 </body>
 
