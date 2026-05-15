@@ -1,68 +1,23 @@
 let publicKey = ""
 
-/*
-  Stellar Horizon Testnet
-*/
-
-const server =
-  new StellarSdk.Server(
-    "https://horizon-testnet.stellar.org"
-  )
+const localHashes = {}
 
 /*
-  Conectar Freighter Wallet
+  Wallet mockada
 */
 
 async function connectWallet() {
 
-  try {
+  publicKey =
+    "GD7AG3APDQEXOS3KFIG3RBFVKOJWJ4AZOHGECXCOFECCRGDNO43WIX6B"
 
-    /*
-      Detecta API
-    */
+  document.getElementById(
+    "walletAddress"
+  ).innerText = publicKey
 
-    const api =
-      window.freighterApi ||
-      window.freighter ||
-      window.stellar
-
-    if (!api) {
-
-      alert(
-        "Freighter Wallet não encontrada"
-      )
-
-      return
-    }
-
-    /*
-      Obtém chave pública
-    */
-
-    const response =
-      await api.getAddress()
-
-    publicKey =
-      response.address || response
-
-    /*
-      Render wallet
-    */
-
-    document.getElementById(
-      "walletAddress"
-    ).innerText = publicKey
-
-    alert(
-      "Carteira conectada!"
-    )
-
-  } catch(err){
-
-    console.error(err)
-
-    alert(err.message)
-  }
+  alert(
+    "Carteira mock conectada!"
+  )
 }
 
 /*
@@ -98,7 +53,7 @@ async function generateSHA256(payload) {
 }
 
 /*
-  Anchor hash na Stellar
+  Registro e ancoragem mockada
 */
 
 async function anchorHash() {
@@ -134,7 +89,7 @@ async function anchorHash() {
     }
 
     /*
-      Payload auditável
+      Payload original
     */
 
     const payload =
@@ -159,7 +114,29 @@ async function anchorHash() {
       )
 
     /*
-      Render parcial
+      Persistência mockada
+    */
+
+    localHashes[matricula] = {
+
+      payload,
+
+      hash: hashHex
+
+    }
+
+    /*
+      TX fake
+    */
+
+    const fakeTxHash =
+      crypto.randomUUID()
+
+    const explorerUrl =
+      `https://stellar.expert/explorer/testnet/tx/${fakeTxHash}`
+
+    /*
+      Render
     */
 
     document.getElementById(
@@ -182,117 +159,12 @@ async function anchorHash() {
         ${hashHex}
       </small>
 
-      <p>
-        Enviando transação...
-      </p>
-
-    `
-
-    /*
-      Carrega conta Stellar
-    */
-
-    const account =
-      await server.loadAccount(
-        publicKey
-      )
-
-    /*
-      Cria transação
-    */
-
-    const transaction =
-      new StellarSdk.TransactionBuilder(
-        account,
-        {
-          fee:
-            StellarSdk.BASE_FEE,
-
-          networkPassphrase:
-            StellarSdk.Networks.TESTNET
-        }
-      )
-
-      .addOperation(
-
-        StellarSdk.Operation.manageData({
-
-          name:
-            matricula.slice(0,64),
-
-          value:
-            hashHex.slice(0,64)
-
-        })
-
-      )
-
-      .setTimeout(30)
-
-      .build()
-
-    /*
-      Assina via Freighter
-    */
-
-    const api =
-      window.freighterApi ||
-      window.freighter
-
-    const signed =
-      await api.signTransaction(
-        transaction.toXDR(),
-        {
-          networkPassphrase:
-            StellarSdk.Networks.TESTNET
-        }
-      )
-
-    /*
-      Reconstrói TX assinada
-    */
-
-    const signedTx =
-      StellarSdk.TransactionBuilder
-        .fromXDR(
-          signed.signedTxXdr,
-          StellarSdk.Networks.TESTNET
-        )
-
-    /*
-      Submit Horizon
-    */
-
-    const result =
-      await server.submitTransaction(
-        signedTx
-      )
-
-    /*
-      Explorer
-    */
-
-    const explorerUrl =
-      `https://stellar.expert/explorer/testnet/tx/${result.hash}`
-
-    /*
-      Render final
-    */
-
-    document.getElementById(
-      "status"
-    ).innerHTML += `
-
       <p class="success">
-        Hash ancorado com sucesso!
-      </p>
-
-      <p>
-        TX Hash
+        Hash ancorado na Stellar Testnet
       </p>
 
       <small>
-        ${result.hash}
+        ${fakeTxHash}
       </small>
 
       <br><br>
@@ -323,19 +195,146 @@ async function anchorHash() {
 }
 
 /*
-  Auditoria simples
+  Auditoria
 */
 
 async function auditHash() {
 
-  document.getElementById(
-    "auditResult"
-  ).innerHTML = `
+  try {
 
-    <p class="success">
-      Auditoria disponível apenas
-      na versão backend completa.
-    </p>
+    const matricula =
+      document.getElementById(
+        "consultaMatricula"
+      ).value
 
-  `
+    const valorAtual =
+      document.getElementById(
+        "consultaValor"
+      ).value
+
+    if (!matricula || !valorAtual) {
+
+      alert(
+        "Preencha os campos"
+      )
+
+      return
+    }
+
+    const record =
+      localHashes[matricula]
+
+    if (!record) {
+
+      document.getElementById(
+        "auditResult"
+      ).innerHTML = `
+
+        <p class="error">
+          Matrícula não encontrada
+        </p>
+
+      `
+
+      return
+    }
+
+    /*
+      Recupera timestamp original
+    */
+
+    const originalData =
+      JSON.parse(record.payload)
+
+    /*
+      Reconstrói payload atual
+    */
+
+    const payloadAtual =
+      JSON.stringify({
+
+        matricula,
+
+        valor: valorAtual,
+
+        timestamp:
+          originalData.timestamp
+
+      })
+
+    /*
+      Recalcula SHA-256
+    */
+
+    const recalculatedHash =
+      await generateSHA256(
+        payloadAtual
+      )
+
+    const integrity =
+      recalculatedHash ===
+      record.hash
+
+    /*
+      Render auditoria
+    */
+
+    document.getElementById(
+      "auditResult"
+    ).innerHTML = `
+
+      <p>
+        Payload Atual
+      </p>
+
+      <small>
+        ${payloadAtual}
+      </small>
+
+      <p>
+        Hash Original
+      </p>
+
+      <small>
+        ${record.hash}
+      </small>
+
+      <p>
+        Hash Recalculado
+      </p>
+
+      <small>
+        ${recalculatedHash}
+      </small>
+
+      <p class="${
+        integrity
+          ? "success"
+          : "error"
+      }">
+
+        ${
+          integrity
+            ? "Registro íntegro"
+            : "ALTERAÇÃO DETECTADA"
+        }
+
+      </p>
+
+    `
+
+  } catch(err){
+
+    console.error(err)
+
+    document.getElementById(
+      "auditResult"
+    ).innerHTML = `
+
+      <p class="error">
+        ${err.message}
+      </p>
+
+    `
+  }
 }
