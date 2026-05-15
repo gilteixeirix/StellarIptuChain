@@ -1,8 +1,21 @@
 import {
   isConnected,
   requestAccess,
-  getAddress
+  getAddress,
+  signTransaction
 } from "https://esm.sh/@stellar/freighter-api"
+
+import * as StellarSdk
+from "https://esm.sh/@stellar/stellar-sdk"
+
+/*
+  Horizon Testnet
+*/
+
+const server =
+  new StellarSdk.Horizon.Server(
+    "https://horizon-testnet.stellar.org"
+  )
 
 /*
   Wallet
@@ -11,7 +24,7 @@ import {
 let publicKey = ""
 
 /*
-  Storage local mockado
+  Cache local auditoria
 */
 
 const localHashes = {}
@@ -49,7 +62,7 @@ async function generateSHA256(payload) {
 }
 
 /*
-  Conectar Freighter
+  Conectar wallet REAL
 */
 
 window.connectWallet =
@@ -59,8 +72,6 @@ window.connectWallet =
 
       const connected =
         await isConnected()
-
-      console.log(connected)
 
       if (!connected.isConnected) {
 
@@ -97,7 +108,7 @@ window.connectWallet =
 }
 
 /*
-  Registrar hash
+  Anchor REAL na Stellar
 */
 
 window.anchorHash =
@@ -159,7 +170,7 @@ window.anchorHash =
         )
 
       /*
-        Simula blockchain
+        Cache auditoria
       */
 
       localHashes[matricula] = {
@@ -171,21 +182,7 @@ window.anchorHash =
       }
 
       /*
-        Fake TX
-      */
-
-      const fakeTxHash =
-        crypto.randomUUID()
-
-      /*
-        Explorer
-      */
-
-      const explorerUrl =
-        `https://stellar.expert/explorer/testnet/tx/${fakeTxHash}`
-
-      /*
-        Render
+        UI parcial
       */
 
       document.getElementById(
@@ -193,14 +190,6 @@ window.anchorHash =
       ).innerHTML = `
 
         <p>
-          Payload
-        </p>
-
-        <small>
-          ${payload}
-        </small>
-
-        <p class="success">
           SHA-256
         </p>
 
@@ -208,12 +197,121 @@ window.anchorHash =
           ${hashHex}
         </small>
 
+        <p>
+          Enviando transação...
+        </p>
+
+      `
+
+      /*
+        Carrega conta
+      */
+
+      const account =
+        await server.loadAccount(
+          publicKey
+        )
+
+      /*
+        Cria TX
+      */
+
+      const tx =
+        new StellarSdk.TransactionBuilder(
+          account,
+          {
+            fee:
+              StellarSdk.BASE_FEE,
+
+            networkPassphrase:
+              StellarSdk.Networks.TESTNET
+          }
+        )
+
+        .addOperation(
+
+          StellarSdk.Operation.manageData({
+
+            name:
+              matricula.slice(0,64),
+
+            value:
+              hashHex.slice(0,64)
+
+          })
+
+        )
+
+        .setTimeout(30)
+
+        .build()
+
+      /*
+        Assina Freighter
+      */
+
+      const signed =
+        await signTransaction(
+          tx.toXDR(),
+          {
+            networkPassphrase:
+              StellarSdk.Networks.TESTNET
+          }
+        )
+
+      /*
+        Reconstrói TX
+      */
+
+      const signedTx =
+        StellarSdk.TransactionBuilder
+          .fromXDR(
+            signed.signedTxXdr,
+            StellarSdk.Networks.TESTNET
+          )
+
+      /*
+        Submit REAL
+      */
+
+      const result =
+        await server.submitTransaction(
+          signedTx
+        )
+
+      /*
+        Explorer REAL
+      */
+
+      const explorerUrl =
+        `https://stellar.expert/explorer/testnet/tx/${result.hash}`
+
+      /*
+        Render final
+      */
+
+      document.getElementById(
+        "status"
+      ).innerHTML = `
+
         <p class="success">
-          Hash ancorado
+          Hash ancorado com sucesso!
+        </p>
+
+        <p>
+          SHA-256
         </p>
 
         <small>
-          ${fakeTxHash}
+          ${hashHex}
+        </small>
+
+        <p>
+          TX Hash
+        </p>
+
+        <small>
+          ${result.hash}
         </small>
 
         <br><br>
@@ -222,7 +320,7 @@ window.anchorHash =
           href="${explorerUrl}"
           target="_blank"
         >
-          Ver Explorer
+          Ver no Explorer
         </a>
 
       `
@@ -231,7 +329,15 @@ window.anchorHash =
 
       console.error(err)
 
-      alert(err.message)
+      document.getElementById(
+        "status"
+      ).innerHTML = `
+
+        <p class="error">
+          ${err.message}
+        </p>
+
+      `
     }
 }
 
@@ -282,15 +388,11 @@ window.auditHash =
       }
 
       /*
-        Timestamp original
+        Payload atual
       */
 
       const originalData =
         JSON.parse(record.payload)
-
-      /*
-        Payload atual
-      */
 
       const payloadAtual =
         JSON.stringify({
@@ -305,7 +407,7 @@ window.auditHash =
         })
 
       /*
-        Recalcula SHA
+        Recalcula hash
       */
 
       const recalculatedHash =
@@ -328,14 +430,6 @@ window.auditHash =
       document.getElementById(
         "auditResult"
       ).innerHTML = `
-
-        <p>
-          Payload Atual
-        </p>
-
-        <small>
-          ${payloadAtual}
-        </small>
 
         <p>
           Hash Original
@@ -372,7 +466,5 @@ window.auditHash =
     } catch(err){
 
       console.error(err)
-
-      alert(err.message)
     }
 }
