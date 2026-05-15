@@ -77,17 +77,31 @@ async function connectWallet(){
     const addressObj =
       await getAddress()
 
-    publicKey =
-      addressObj.address
+publicKey =
+  addressObj.address
 
-    document.getElementById(
-      "walletAddress"
-    ).innerText =
-      publicKey
+/*
+  TESTE REAL
+*/
 
-    alert(
-      "Wallet conectada!"
-    )
+const account =
+  await server.loadAccount(
+    publicKey
+  )
+
+console.log(
+  "ACCOUNT",
+  account
+)
+
+document.getElementById(
+  "walletAddress"
+).innerText =
+  publicKey
+
+alert(
+  "Wallet REAL conectada!"
+)
 
   } catch(err){
 
