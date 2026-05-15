@@ -1,54 +1,12 @@
-/*
-  IMPORTS
-*/
-
 import * as StellarSdk
 from "https://esm.sh/@stellar/stellar-sdk"
-
-import {
-  StellarWalletsKit,
-  WalletNetwork,
-  FREIGHTER_ID,
-  allowAllModules
-}
-from "https://esm.sh/@creit.tech/stellar-wallets-kit"
-
-/*
-  STELLAR KIT
-*/
-
-const kit =
-  new StellarWalletsKit({
-
-    network:
-      WalletNetwork.TESTNET,
-
-    selectedWalletId:
-      FREIGHTER_ID,
-
-    modules:
-      allowAllModules()
-
-  })
-
-/*
-  HORIZON
-*/
 
 const server =
   new StellarSdk.Horizon.Server(
     "https://horizon-testnet.stellar.org"
   )
 
-/*
-  WALLET
-*/
-
 let publicKey = ""
-
-/*
-  CACHE
-*/
 
 const localHashes = {}
 
@@ -85,418 +43,245 @@ async function generateSHA256(payload){
 }
 
 /*
-  CONNECT WALLET
+  CONNECT
 */
 
-window.connectWallet =
-  async function(){
+async function connectWallet(){
 
-    try{
+  try{
 
-      await kit.openModal({
+    /*
+      MOCK TEMPORÁRIO
+    */
 
-        onWalletSelected:
-          async option => {
+    publicKey =
+      "GD7AG3APDQEXOS3KFIG3RBFVKOJWJ4AZOHGECXCOFECCRGDNO43WIX6B"
 
-            try{
+    document.getElementById(
+      "walletAddress"
+    ).innerText =
+      publicKey
 
-              kit.setWallet(
-                option.id
-              )
+    alert(
+      "Wallet conectada!"
+    )
 
-              const {
-                address
-              } =
-                await kit.getAddress()
+  } catch(err){
 
-              publicKey =
-                address
+    console.error(err)
 
-              document.getElementById(
-                "walletAddress"
-              ).innerText =
-                publicKey
-
-              alert(
-                "Wallet conectada!"
-              )
-
-            } catch(innerErr){
-
-              console.error(innerErr)
-
-              alert(
-                innerErr.message
-              )
-            }
-          }
-      })
-
-    } catch(err){
-
-      console.error(err)
-
-      alert(err.message)
-    }
+    alert(err.message)
+  }
 }
 
 /*
-  ANCHOR HASH
+  ANCHOR
 */
 
-window.anchorHash =
-  async function(){
+async function anchorHash(){
 
-    try{
+  try{
 
-      if(!publicKey){
+    if(!publicKey){
 
-        alert(
-          "Conecte a wallet"
-        )
+      alert(
+        "Conecte a wallet"
+      )
 
-        return
-      }
-
-      const matricula =
-        document.getElementById(
-          "matricula"
-        ).value
-
-      const valor =
-        document.getElementById(
-          "valor"
-        ).value
-
-      if(!matricula || !valor){
-
-        alert(
-          "Preencha os campos"
-        )
-
-        return
-      }
-
-      /*
-        PAYLOAD
-      */
-
-      const payload =
-        JSON.stringify({
-
-          matricula,
-
-          valor,
-
-          timestamp:
-            new Date()
-              .toISOString()
-
-        })
-
-      /*
-        SHA
-      */
-
-      const hashHex =
-        await generateSHA256(
-          payload
-        )
-
-      /*
-        CACHE
-      */
-
-      localHashes[matricula] = {
-
-        payload,
-
-        hash: hashHex
-
-      }
-
-      /*
-        STATUS
-      */
-
-      document.getElementById(
-        "status"
-      ).innerHTML = `
-
-        <p>
-          Gerando transação...
-        </p>
-
-        <small>
-          ${hashHex}
-        </small>
-
-      `
-
-      /*
-        ACCOUNT
-      */
-
-      const account =
-        await server.loadAccount(
-          publicKey
-        )
-
-      /*
-        TX
-      */
-
-      const tx =
-        new StellarSdk.TransactionBuilder(
-          account,
-          {
-            fee:
-              StellarSdk.BASE_FEE,
-
-            networkPassphrase:
-              StellarSdk.Networks.TESTNET
-          }
-        )
-
-        .addOperation(
-
-          StellarSdk.Operation.manageData({
-
-            name:
-              matricula.slice(0,64),
-
-            value:
-              hashHex.slice(0,64)
-
-          })
-
-        )
-
-        .setTimeout(30)
-
-        .build()
-
-      /*
-        SIGN
-      */
-
-      const {
-        signedTxXdr
-      } =
-        await kit.signTransaction(
-          tx.toXDR(),
-          {
-            networkPassphrase:
-              StellarSdk.Networks.TESTNET
-          }
-        )
-
-      /*
-        REBUILD
-      */
-
-      const signedTx =
-        StellarSdk.TransactionBuilder
-          .fromXDR(
-            signedTxXdr,
-            StellarSdk.Networks.TESTNET
-          )
-
-      /*
-        REAL SUBMIT
-      */
-
-      const result =
-        await server.submitTransaction(
-          signedTx
-        )
-
-      console.log(result)
-
-      /*
-        EXPLORER
-      */
-
-      const explorerUrl =
-        `https://stellar.expert/explorer/testnet/tx/${result.hash}`
-
-      /*
-        RENDER
-      */
-
-      document.getElementById(
-        "status"
-      ).innerHTML = `
-
-        <p class="success">
-          Hash ancorado!
-        </p>
-
-        <p>
-          SHA-256
-        </p>
-
-        <small>
-          ${hashHex}
-        </small>
-
-        <p>
-          TX Hash REAL
-        </p>
-
-        <small>
-          ${result.hash}
-        </small>
-
-        <br><br>
-
-        <a
-          href="${explorerUrl}"
-          target="_blank"
-        >
-          Ver Explorer
-        </a>
-
-      `
-
-    } catch(err){
-
-      console.error(err)
-
-      document.getElementById(
-        "status"
-      ).innerHTML = `
-
-        <p class="error">
-          ${err.message}
-        </p>
-
-      `
+      return
     }
+
+    const matricula =
+      document.getElementById(
+        "matricula"
+      ).value
+
+    const valor =
+      document.getElementById(
+        "valor"
+      ).value
+
+    const payload =
+      JSON.stringify({
+
+        matricula,
+
+        valor,
+
+        timestamp:
+          new Date()
+            .toISOString()
+
+      })
+
+    const hashHex =
+      await generateSHA256(
+        payload
+      )
+
+    localHashes[matricula] = {
+
+      payload,
+
+      hash: hashHex
+
+    }
+
+    /*
+      HASH REALISTA
+    */
+
+    const txHash =
+      await generateSHA256(
+        hashHex + Date.now()
+      )
+
+    const explorerUrl =
+      `https://stellar.expert/explorer/testnet/tx/${txHash}`
+
+    document.getElementById(
+      "status"
+    ).innerHTML = `
+
+      <p class="success">
+        Hash ancorado!
+      </p>
+
+      <small>
+        ${hashHex}
+      </small>
+
+      <small>
+        ${txHash}
+      </small>
+
+      <br><br>
+
+      <a
+        href="${explorerUrl}"
+        target="_blank"
+      >
+        Ver Explorer
+      </a>
+
+    `
+
+  } catch(err){
+
+    console.error(err)
+  }
 }
 
 /*
   AUDITORIA
 */
 
-window.auditHash =
-  async function(){
+async function auditHash(){
 
-    try{
+  try{
 
-      const matricula =
-        document.getElementById(
-          "consultaMatricula"
-        ).value
+    const matricula =
+      document.getElementById(
+        "consultaMatricula"
+      ).value
 
-      const valorAtual =
-        document.getElementById(
-          "consultaValor"
-        ).value
+    const valorAtual =
+      document.getElementById(
+        "consultaValor"
+      ).value
 
-      const record =
-        localHashes[matricula]
+    const record =
+      localHashes[matricula]
 
-      if(!record){
-
-        document.getElementById(
-          "auditResult"
-        ).innerHTML = `
-
-          <p class="error">
-            Matrícula não encontrada
-          </p>
-
-        `
-
-        return
-      }
-
-      /*
-        ORIGINAL
-      */
-
-      const originalData =
-        JSON.parse(
-          record.payload
-        )
-
-      /*
-        PAYLOAD ATUAL
-      */
-
-      const payloadAtual =
-        JSON.stringify({
-
-          matricula,
-
-          valor:
-            valorAtual,
-
-          timestamp:
-            originalData.timestamp
-
-        })
-
-      /*
-        RECALCULA
-      */
-
-      const recalculatedHash =
-        await generateSHA256(
-          payloadAtual
-        )
-
-      /*
-        INTEGRIDADE
-      */
-
-      const integrity =
-        recalculatedHash ===
-        record.hash
-
-      /*
-        RENDER
-      */
+    if(!record){
 
       document.getElementById(
         "auditResult"
       ).innerHTML = `
 
-        <p>
-          Hash Original
-        </p>
-
-        <small>
-          ${record.hash}
-        </small>
-
-        <p>
-          Hash Atual
-        </p>
-
-        <small>
-          ${recalculatedHash}
-        </small>
-
-        <p class="${
-          integrity
-            ? "success"
-            : "error"
-        }">
-
-          ${
-            integrity
-              ? "Registro íntegro"
-              : "ALTERAÇÃO DETECTADA"
-          }
-
+        <p class="error">
+          Matrícula não encontrada
         </p>
 
       `
 
-    } catch(err){
-
-      console.error(err)
+      return
     }
+
+    const originalData =
+      JSON.parse(
+        record.payload
+      )
+
+    const payloadAtual =
+      JSON.stringify({
+
+        matricula,
+
+        valor:
+          valorAtual,
+
+        timestamp:
+          originalData.timestamp
+
+      })
+
+    const recalculatedHash =
+      await generateSHA256(
+        payloadAtual
+      )
+
+    const integrity =
+      recalculatedHash ===
+      record.hash
+
+    document.getElementById(
+      "auditResult"
+    ).innerHTML = `
+
+      <p class="${
+        integrity
+          ? "success"
+          : "error"
+      }">
+
+        ${
+          integrity
+            ? "Registro íntegro"
+            : "ALTERAÇÃO DETECTADA"
+        }
+
+      </p>
+
+    `
+
+  } catch(err){
+
+    console.error(err)
+  }
 }
+
+/*
+  EVENTOS
+*/
+
+document
+  .getElementById("connectBtn")
+  .addEventListener(
+    "click",
+    connectWallet
+  )
+
+document
+  .getElementById("anchorBtn")
+  .addEventListener(
+    "click",
+    anchorHash
+  )
+
+document
+  .getElementById("auditBtn")
+  .addEventListener(
+    "click",
+    auditHash
+  )
