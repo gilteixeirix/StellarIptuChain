@@ -243,10 +243,9 @@ async function anchorHash(){
       await server.submitTransaction(
         signedTx
       )
-console.log(
-  "SUBMIT RESULT",
-  result
-)
+    console.log(
+    "SUBMIT RESULT", result
+              )
     /*
       EXPLORER REAL
     */
