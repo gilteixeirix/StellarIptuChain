@@ -214,8 +214,14 @@
 
   <script type="module">
 
-    import * as StellarSdk
-    from "https://esm.sh/@stellar/stellar-sdk"
+import {
+  Server,
+  TransactionBuilder,
+  Networks,
+  BASE_FEE,
+  Operation
+}
+from "https://esm.sh/stellar-sdk"
 
     import {
       isConnected,
@@ -225,10 +231,10 @@
     }
     from "https://esm.sh/@stellar/freighter-api"
 
-    const server =
-      new StellarSdk.Horizon.Server(
-        "https://horizon-testnet.stellar.org"
-      )
+const server =
+  new Server(
+    "https://horizon-testnet.stellar.org"
+  )
 
     let publicKey = ""
 
@@ -394,20 +400,20 @@
           */
 
           const tx =
-            new StellarSdk.TransactionBuilder(
+            new TransactionBuilder(
               account,
               {
                 fee:
-                  StellarSdk.BASE_FEE,
+                  BASE_FEE,
 
                 networkPassphrase:
-                  StellarSdk.Networks.TESTNET
+                  Networks.TESTNET
               }
             )
 
             .addOperation(
 
-              StellarSdk.Operation.manageData({
+              Operation.manageData({
 
                 name:
                   matricula.slice(0,64),
