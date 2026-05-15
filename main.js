@@ -51,7 +51,7 @@ async function generateSHA256(payload){
 }
 
 /*
-  CONNECT
+  CONNECT WALLET REAL
 */
 
 async function connectWallet(){
@@ -77,42 +77,45 @@ async function connectWallet(){
     const addressObj =
       await getAddress()
 
-publicKey =
-  addressObj.address
+    publicKey =
+      addressObj.address
 
-/*
-  TESTE REAL
-*/
+    /*
+      VALIDA CONTA REAL
+    */
 
-const account =
-  await server.loadAccount(
-    publicKey
-  )
+    const account =
+      await server.loadAccount(
+        publicKey
+      )
 
-console.log(
-  "ACCOUNT",
-  account
-)
+    console.log(
+      "ACCOUNT",
+      account
+    )
 
-document.getElementById(
-  "walletAddress"
-).innerText =
-  publicKey
+    document.getElementById(
+      "walletAddress"
+    ).innerText =
+      publicKey
 
-alert(
-  "Wallet REAL conectada!"
-)
+    alert(
+      "Wallet REAL conectada!"
+    )
 
   } catch(err){
 
     console.error(err)
 
-    alert(err.message)
+    alert(
+      "Erro conexão: " +
+      err.message
+    )
   }
 }
 
 /*
-  ANCHOR
+  ANCHOR HASH REAL
 */
 
 async function anchorHash(){
@@ -138,6 +141,19 @@ async function anchorHash(){
         "valor"
       ).value
 
+    if(!matricula || !valor){
+
+      alert(
+        "Preencha os campos"
+      )
+
+      return
+    }
+
+    /*
+      PAYLOAD
+    */
+
     const payload =
       JSON.stringify({
 
@@ -160,6 +176,10 @@ async function anchorHash(){
         payload
       )
 
+    /*
+      CACHE LOCAL
+    */
+
     localHashes[matricula] = {
 
       payload,
@@ -169,7 +189,21 @@ async function anchorHash(){
     }
 
     /*
-      ACCOUNT
+      STATUS
+    */
+
+    document.getElementById(
+      "status"
+    ).innerHTML = `
+
+      <p>
+        Enviando transação...
+      </p>
+
+    `
+
+    /*
+      LOAD ACCOUNT
     */
 
     const account =
@@ -178,7 +212,7 @@ async function anchorHash(){
       )
 
     /*
-      TX
+      BUILD TX
     */
 
     const tx =
@@ -225,7 +259,7 @@ async function anchorHash(){
       )
 
     /*
-      REBUILD
+      REBUILD TX
     */
 
     const signedTx =
@@ -243,15 +277,25 @@ async function anchorHash(){
       await server.submitTransaction(
         signedTx
       )
+
     console.log(
-    "SUBMIT RESULT", result
-              )
+      "SUBMIT RESULT",
+      result
+    )
+
+    /*
+      HASH REAL
+    */
+
+    const txHash =
+      result.hash
+
     /*
       EXPLORER REAL
     */
 
     const explorerUrl =
-      `https://stellar.expert/explorer/testnet/tx/${result.hash}`
+      `https://stellar.expert/explorer/testnet/tx/${txHash}`
 
     /*
       RENDER
@@ -262,7 +306,7 @@ async function anchorHash(){
     ).innerHTML = `
 
       <p class="success">
-        Hash ancorado!
+        Hash ancorado na Stellar!
       </p>
 
       <p>
@@ -278,7 +322,7 @@ async function anchorHash(){
       </p>
 
       <small>
-        ${result.hash}
+        ${txHash}
       </small>
 
       <br><br>
@@ -375,6 +419,22 @@ async function auditHash(){
       "auditResult"
     ).innerHTML = `
 
+      <p>
+        Hash Original
+      </p>
+
+      <small>
+        ${record.hash}
+      </small>
+
+      <p>
+        Hash Atual
+      </p>
+
+      <small>
+        ${recalculatedHash}
+      </small>
+
       <p class="${
         integrity
           ? "success"
@@ -402,21 +462,27 @@ async function auditHash(){
 */
 
 document
-  .getElementById("connectBtn")
+  .getElementById(
+    "connectBtn"
+  )
   .addEventListener(
     "click",
     connectWallet
   )
 
 document
-  .getElementById("anchorBtn")
+  .getElementById(
+    "anchorBtn"
+  )
   .addEventListener(
     "click",
     anchorHash
   )
 
 document
-  .getElementById("auditBtn")
+  .getElementById(
+    "auditBtn"
+  )
   .addEventListener(
     "click",
     auditHash
