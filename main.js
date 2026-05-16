@@ -1,11 +1,5 @@
-import {
-  Server,
-  TransactionBuilder,
-  Networks,
-  BASE_FEE,
-  Operation
-}
-from "https://esm.sh/stellar-sdk"
+import * as StellarSdk
+from "https://esm.sh/@stellar/stellar-sdk"
 
 import {
   isConnected,
@@ -16,7 +10,7 @@ import {
 from "https://esm.sh/@stellar/freighter-api"
 
 const server =
-  new Server(
+  new StellarSdk.Horizon.Server(
     "https://horizon-testnet.stellar.org"
   )
 
@@ -57,7 +51,7 @@ async function generateSHA256(payload){
 }
 
 /*
-  CONNECT WALLET REAL
+  CONNECT
 */
 
 async function connectWallet(){
@@ -83,45 +77,42 @@ async function connectWallet(){
     const addressObj =
       await getAddress()
 
-    publicKey =
-      addressObj.address
+publicKey =
+  addressObj.address
 
-    /*
-      VALIDA CONTA REAL
-    */
+/*
+  TESTE REAL
+*/
 
-    const account =
-      await server.loadAccount(
-        publicKey
-      )
+const account =
+  await server.loadAccount(
+    publicKey
+  )
 
-    console.log(
-      "ACCOUNT",
-      account
-    )
+console.log(
+  "ACCOUNT",
+  account
+)
 
-    document.getElementById(
-      "walletAddress"
-    ).innerText =
-      publicKey
+document.getElementById(
+  "walletAddress"
+).innerText =
+  publicKey
 
-    alert(
-      "Wallet REAL conectada!"
-    )
+alert(
+  "Wallet REAL conectada!"
+)
 
   } catch(err){
 
     console.error(err)
 
-    alert(
-      "Erro conexão: " +
-      err.message
-    )
+    alert(err.message)
   }
 }
 
 /*
-  ANCHOR HASH REAL
+  ANCHOR
 */
 
 async function anchorHash(){
@@ -147,19 +138,6 @@ async function anchorHash(){
         "valor"
       ).value
 
-    if(!matricula || !valor){
-
-      alert(
-        "Preencha os campos"
-      )
-
-      return
-    }
-
-    /*
-      PAYLOAD
-    */
-
     const payload =
       JSON.stringify({
 
@@ -182,10 +160,6 @@ async function anchorHash(){
         payload
       )
 
-    /*
-      CACHE LOCAL
-    */
-
     localHashes[matricula] = {
 
       payload,
@@ -195,21 +169,7 @@ async function anchorHash(){
     }
 
     /*
-      STATUS
-    */
-
-    document.getElementById(
-      "status"
-    ).innerHTML = `
-
-      <p>
-        Enviando transação...
-      </p>
-
-    `
-
-    /*
-      LOAD ACCOUNT
+      ACCOUNT
     */
 
     const account =
@@ -218,24 +178,24 @@ async function anchorHash(){
       )
 
     /*
-      BUILD TX
+      TX
     */
 
     const tx =
-      new TransactionBuilder(
+      new StellarSdk.TransactionBuilder(
         account,
         {
           fee:
-            BASE_FEE,
+            StellarSdk.BASE_FEE,
 
           networkPassphrase:
-            Networks.TESTNET
+            StellarSdk.Networks.TESTNET
         }
       )
 
       .addOperation(
 
-        Operation.manageData({
+        StellarSdk.Operation.manageData({
 
           name:
             matricula.slice(0,64),
@@ -265,7 +225,7 @@ async function anchorHash(){
       )
 
     /*
-      REBUILD TX
+      REBUILD
     */
 
     const signedTx =
@@ -283,25 +243,15 @@ async function anchorHash(){
       await server.submitTransaction(
         signedTx
       )
-
     console.log(
-      "SUBMIT RESULT",
-      result
-    )
-
-    /*
-      HASH REAL
-    */
-
-    const txHash =
-      result.hash
-
+    "SUBMIT RESULT", result
+              )
     /*
       EXPLORER REAL
     */
 
     const explorerUrl =
-      `https://stellar.expert/explorer/testnet/tx/${txHash}`
+      `https://stellar.expert/explorer/testnet/tx/${result.hash}`
 
     /*
       RENDER
@@ -312,7 +262,7 @@ async function anchorHash(){
     ).innerHTML = `
 
       <p class="success">
-        Hash ancorado na Stellar!
+        Hash ancorado!
       </p>
 
       <p>
@@ -328,7 +278,7 @@ async function anchorHash(){
       </p>
 
       <small>
-        ${txHash}
+        ${result.hash}
       </small>
 
       <br><br>
@@ -425,22 +375,6 @@ async function auditHash(){
       "auditResult"
     ).innerHTML = `
 
-      <p>
-        Hash Original
-      </p>
-
-      <small>
-        ${record.hash}
-      </small>
-
-      <p>
-        Hash Atual
-      </p>
-
-      <small>
-        ${recalculatedHash}
-      </small>
-
       <p class="${
         integrity
           ? "success"
@@ -468,27 +402,21 @@ async function auditHash(){
 */
 
 document
-  .getElementById(
-    "connectBtn"
-  )
+  .getElementById("connectBtn")
   .addEventListener(
     "click",
     connectWallet
   )
 
 document
-  .getElementById(
-    "anchorBtn"
-  )
+  .getElementById("anchorBtn")
   .addEventListener(
     "click",
     anchorHash
   )
 
 document
-  .getElementById(
-    "auditBtn"
-  )
+  .getElementById("auditBtn")
   .addEventListener(
     "click",
     auditHash
