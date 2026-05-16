@@ -216,51 +216,26 @@ async function connectWallet(){
 
   try{
 
-    console.log("CONNECT")
+    if(!window.freighter){
 
-    if(
-      !window.freighter
-    ){
-
-      alert(
-        "Freighter não encontrada"
-      )
+      alert("Freighter não encontrada")
 
       return
     }
 
-    const result =
-      await window.freighter
-        .getPublicKey()
+    const publicKey =
+      await window.freighter.getPublicKey()
 
-    publicKey =
-      result
+    console.log(publicKey)
 
-    document.getElementById(
-      "wallet"
-    ).innerText =
-      publicKey
+    alert("Wallet encontrada!")
 
-    /*
-      TESTE REAL
-    */
-
-    const account =
-      await server.loadAccount(
-        publicKey
-      )
-
-    console.log(account)
-
-    alert(
-      "Wallet REAL conectada"
-    )
-
-  } catch(err){
+  }catch(err){
 
     console.error(err)
 
     alert(err.message)
+
   }
 }
 
