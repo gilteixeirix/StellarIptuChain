@@ -219,7 +219,7 @@ async function connectWallet(){
     console.log("CONNECT")
 
     if(
-      !window.freighterApi
+      !window.freighter
     ){
 
       alert(
@@ -230,7 +230,7 @@ async function connectWallet(){
     }
 
     const result =
-      await window.freighterApi
+      await window.freighter
         .getPublicKey()
 
     publicKey =
@@ -352,7 +352,7 @@ async function anchorHash(){
     */
 
     const signedXDR =
-      await window.freighterApi
+      await window.freighter
         .signTransaction(
           tx.toXDR(),
           "TESTNET"
