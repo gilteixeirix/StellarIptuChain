@@ -1,0 +1,84 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "IPTU Chain Oracle API",
+    "description": "API para auditoria e simulação de dados fiscais na blockchain Stellar",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Servidor Local"
+    }
+  ],
+  "paths": {
+    "/api/auditar/stream": {
+      "get": {
+        "summary": "Auditar Matrícula (Server-Sent Events)",
+        "description": "Inicia uma auditoria comparando o banco local com o ledger da Stellar e retorna eventos de progresso em tempo real.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "matricula",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "IPTU-2026-0001"
+            },
+            "description": "A matrícula do imóvel a ser auditada."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Fluxo de eventos SSE estabelecido",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/simular-fraude": {
+      "post": {
+        "summary": "Simular Fraude no Banco Local",
+        "description": "Altera o valor do IPTU no banco de dados local silenciosamente (sem acionar o sistema legítimo), forçando uma divergência criptográfica na próxima auditoria.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "matricula": {
+                    "type": "string",
+                    "example": "IPTU-2026-0001"
+                  },
+                  "novoValor": {
+                    "type": "number",
+                    "example": 9999
+                  }
+                },
+                "required": ["matricula", "novoValor"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Fraude simulada com sucesso."
+          },
+          "400": {
+            "description": "Parâmetros inválidos."
+          },
+          "404": {
+            "description": "Matrícula não encontrada no banco local."
+          }
+        }
+      }
+    }
+  }
+}

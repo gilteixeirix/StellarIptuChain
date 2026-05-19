@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IPTU Chain - Plataforma Fiscal Blockchain</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+    
+    body {
+      background: linear-gradient(135deg, #020617 0%, #0f172a 100%);
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 20px;
+      overflow-x: hidden;
+    }
+
+    /* Ambient background glows */
+    .glow-1 { position: absolute; top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%); border-radius: 50%; z-index: -1; }
+    .glow-2 { position: absolute; bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%); border-radius: 50%; z-index: -1; }
+
+    header {
+      text-align: center;
+      max-width: 800px;
+      margin-bottom: 60px;
+      animation: fadeInDown 1s ease-out;
+    }
+
+    .logo-img {
+      width: 140px;
+      height: auto;
+      margin-bottom: 20px;
+      border-radius: 24px;
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.3);
+      background: white; /* just in case the logo has a transparent bg and dark elements, or to blend well */
+      padding: 10px;
+    }
+
+    h1 {
+      font-size: 4rem;
+      font-weight: 800;
+      background: linear-gradient(to right, #38bdf8, #8b5cf6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+      letter-spacing: -1px;
+    }
+
+    p.intro {
+      font-size: 1.25rem;
+      color: #94a3b8;
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      width: 100%;
+      max-width: 1100px;
+      animation: fadeInUp 1s ease-out 0.3s backwards;
+    }
+
+    /* Glassmorphism Cards */
+    .card {
+      background: rgba(30, 41, 59, 0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 40px 30px;
+      text-decoration: none;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(to right, transparent, transparent);
+      transition: all 0.4s;
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+      background: rgba(30, 41, 59, 0.8);
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .card.v1:hover::before { background: linear-gradient(to right, #38bdf8, #2563eb); }
+    .card.v2:hover::before { background: linear-gradient(to right, #10b981, #059669); }
+    .card.swagger:hover::before { background: linear-gradient(to right, #f59e0b, #d97706); }
+    .card.arch:hover::before { background: linear-gradient(to right, #8b5cf6, #ec4899); }
+
+    .card-icon {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      display: inline-block;
+    }
+
+    .card h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: #f8fafc;
+    }
+
+    .card p {
+      color: #cbd5e1;
+      font-size: 1rem;
+      line-height: 1.5;
+      font-weight: 300;
+      flex-grow: 1;
+    }
+
+    .card-action {
+      margin-top: 25px;
+      display: flex;
+      align-items: center;
+      font-weight: 600;
+      color: #38bdf8;
+      transition: color 0.3s;
+    }
+
+    .card.v2 .card-action { color: #10b981; }
+    .card.swagger .card-action { color: #f59e0b; }
+    .card.arch .card-action { color: #8b5cf6; }
+
+    .card-action span { margin-left: 8px; transition: transform 0.3s; }
+    .card:hover .card-action span { transform: translateX(5px); }
+
+    /* Animations */
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="glow-1"></div>
+  <div class="glow-2"></div>
+
+  <header>
+    <img src="assets/iptu-chain-image.jpeg" alt="IPTU Chain Logo" class="logo-img">
+    <h1>IPTU Chain</h1>
+    <p class="intro">
+      Plataforma autônoma de ancoragem e auditoria fiscal integrada à blockchain <strong>Stellar</strong>. 
+      Demonstrando transparência governamental através de provas criptográficas imutáveis e execução de Smart Contracts.
+    </p>
+  </header>
+
+  <div class="grid-container">
+    
+    <!-- V1 Mock Card -->
+    <a href="auditoria_manual_mock.html" class="card v1">
+      <div class="card-icon">🪪</div>
+      <h2>Assinatura Manual (Mock)</h2>
+      <p>
+        Abordagem descentralizada pelo cliente com carteira simulada. Ideal para demonstrações rápidas sem a necessidade de instalar a extensão Freighter.
+      </p>
+      <div class="card-action">Acessar Dashboard Mock <span>→</span></div>
+    </a>
+
+    <!-- V1 Freighter Card -->
+    <a href="auditoria_manual_freighter.html" class="card v1">
+      <div class="card-icon">🦊</div>
+      <h2>Assinatura Manual (Freighter Real)</h2>
+      <p>
+        Integração Web3 genuína. Requer a extensão de navegador Freighter instalada para assinar as operações criptográficas na Stellar Testnet.
+      </p>
+      <div class="card-action">Acessar Dashboard Freighter <span>→</span></div>
+    </a>
+
+    <!-- V2 Card -->
+    <a href="oracle.html" class="card v2">
+      <div class="card-icon">👁️‍🗨️</div>
+      <h2>Oráculo Autônomo</h2>
+      <p>
+        Abordagem centralizada segura. O servidor atua como um Oráculo que detecta divergências e ancora o estado de forma autônoma.
+      </p>
+      <div class="card-action">Acessar Oráculo <span>→</span></div>
+    </a>
+
+    <!-- Hybrid Card -->
+    <a href="auditoria_hibrida.html" class="card v2">
+      <div class="card-icon">🤝</div>
+      <h2>Oráculo Híbrido (Freighter)</h2>
+      <p>
+        A interface definitiva. O servidor delega a transação montada (XDR) para o frontend e o cidadão assina na extensão Freighter.
+      </p>
+      <div class="card-action">Acessar Oráculo Híbrido <span>→</span></div>
+    </a>
+
+    <!-- Swagger Card -->
+    <a href="/api-docs" class="card swagger">
+      <div class="card-icon">⚡</div>
+      <h2>API Docs & Simulação</h2>
+      <p>
+        Acesse a documentação interativa (Swagger UI) para analisar as rotas do backend e acionar a simulação de fraude injetando valores ilegítimos diretamente no banco de dados.
+      </p>
+      <div class="card-action">Acessar Swagger UI <span>→</span></div>
+    </a>
+
+    <!-- Arquitetura Futura Card -->
+    <a href="arquitetura_futura.html" target="_blank" class="card arch">
+      <div class="card-icon">🚀</div>
+      <h2>Evolução da Arquitetura</h2>
+      <p>
+        O mapeamento e planejamento detalhado para a evolução da arquitetura do Oráculo para <strong>Smart Contracts nativos (Soroban)</strong> na rede Stellar.
+      </p>
+      <div class="card-action">Acessar Documentação <span>→</span></div>
+    </a>
+
+  </div>
+
+</body>
+</html>

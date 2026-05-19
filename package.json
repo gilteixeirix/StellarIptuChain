@@ -1,0 +1,18 @@
+{
+  "name": "iptu-chain-oracle",
+  "version": "1.0.0",
+  "description": "Oráculo de auditoria do IPTU Chain",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@stellar/freighter-api": "^3.0.0",
+    "@stellar/stellar-sdk": "^13.3.0",
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.2",
+    "swagger-ui-express": "^5.0.1"
+  }
+}

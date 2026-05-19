@@ -18,6 +18,11 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/stellar-sdk/13.3.0/stellar-sdk.min.js"></script>
 
+  <script type="module">
+    import * as freighterModule from 'https://cdn.jsdelivr.net/npm/@stellar/freighter-api@3.0.0/+esm';
+    window.freighterApi = freighterModule.default ? freighterModule.default : freighterModule;
+  </script>
+
   <style>
 
     *{
@@ -132,6 +137,14 @@
 
   <div class="container">
 
+<div style="background: #1e293b; padding: 15px; text-align: center; margin-bottom: 20px; border-radius: 12px; border: 2px solid #22c55e;">
+  <h2 style="color: #22c55e; margin-bottom: 10px;">Auditoria Descentralizada (Freighter Real)</h2>
+  <p style="color: #cbd5e1; margin-bottom: 10px;">Assinatura verdadeira via carteira do cidadão (requer extensão Freighter instalada).</p>
+  <a href="index.html" style="color: white; background: #22c55e; padding: 10px 20px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; margin-right: 10px;">🏠 Voltar para o Início</a>
+  <a href="oracle.html" style="color: white; background: #334155; padding: 10px 20px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">👉 Ver Oráculo Automático</a>
+</div>
+
+
     <h1>
       IPTU Chain
     </h1>
@@ -158,6 +171,10 @@
       <small id="walletAddress">
         Não conectada
       </small>
+
+      <a id="walletHistory" href="#" target="_blank" style="display: block; margin-top: 10px; font-size: 0.9em; text-align: center; display: none;">
+        📊 Ver Histórico de Transações (Stellar Expert)
+      </a>
 
     </div>
 
@@ -227,6 +244,22 @@
 
     </div>
 
+    <!-- HISTÓRICO -->
+    <div id="historyContainer" class="card" style="display: none; border-left: 8px solid #38bdf8;">
+      <h3 style="color: #cbd5e1; margin-bottom: 10px;">Histórico de Ancoragens</h3>
+      <table style="width: 100%; border-collapse: collapse; font-size: 0.9em; text-align: left;">
+        <thead>
+          <tr style="border-bottom: 1px solid #475569; color: #94a3b8;">
+            <th style="padding: 8px 0;">Data/Hora</th>
+            <th style="padding: 8px 0;">Hash Salvo</th>
+            <th style="padding: 8px 0;">TX</th>
+          </tr>
+        </thead>
+        <tbody id="historyTableBody">
+        </tbody>
+      </table>
+    </div>
+
   </div>
 
   <script>
@@ -289,23 +322,38 @@
     */
 
     async function connectWallet(){
+      try {
+        if (!window.freighterApi) {
+          throw new Error("A biblioteca do Freighter não carregou.");
+        }
+        const connectedResponse = await window.freighterApi.isConnected();
+        if (!connectedResponse.isConnected) {
+          alert("A extensão Freighter não foi detectada. Por favor, instale a extensão no seu navegador.");
+          return;
+        }
 
-      try{
+        const access = await window.freighterApi.requestAccess();
+        if (access.error) {
+          throw new Error("Acesso negado ou erro ao conectar com o Freighter.");
+        }
 
-        /*
-          MOCK TEMPORÁRIO
-        */
-
-        publicKey =
-          "GBG2SHNO4UZYG3OCUJSVCGA6LDUP7SUBSCHH75SSUIJYLHX7NBFGXWKO"
+        const addressResponse = await window.freighterApi.getAddress();
+        if (addressResponse.error) {
+          throw new Error(addressResponse.error);
+        }
+        publicKey = addressResponse.address;
 
         document.getElementById(
           "walletAddress"
         ).innerText =
           publicKey
 
+        const historyLink = document.getElementById("walletHistory");
+        historyLink.href = `https://stellar.expert/explorer/testnet/account/${publicKey}`;
+        historyLink.style.display = "block";
+
         alert(
-          "Wallet conectada!"
+          "Wallet conectada com sucesso!"
         )
 
       } catch(err){
@@ -391,11 +439,47 @@
         }
 
         /*
-          MOCK TX
+          Carregar Sequence Number da Conta
         */
+        const account = await server.loadAccount(publicKey);
 
-        const txHash =
-          crypto.randomUUID()
+        /*
+          Construir a Transação ManageData
+        */
+        const tx = new StellarSdk.TransactionBuilder(account, {
+          fee: StellarSdk.BASE_FEE,
+          networkPassphrase: StellarSdk.Networks.TESTNET
+        })
+        .addOperation(StellarSdk.Operation.manageData({
+          name: matricula.slice(0, 64),
+          value: hashHex.slice(0, 64)
+        }))
+        .setTimeout(60)
+        .build();
+
+        /*
+          Solicitar Assinatura na Freighter
+        */
+        document.getElementById("status").innerHTML = `<p style="color:#f59e0b">Aguardando assinatura na extensão Freighter...</p>`;
+        
+        const signedXdrResponse = await window.freighterApi.signTransaction(tx.toXDR(), {
+          network: "TESTNET",
+          networkPassphrase: "Test SDF Network ; September 2015"
+        });
+
+        if (signedXdrResponse.error) {
+          throw new Error("Transação rejeitada pelo usuário na extensão Freighter.");
+        }
+
+        const signedTx = StellarSdk.TransactionBuilder.fromXDR(signedXdrResponse.signedTxXdr, StellarSdk.Networks.TESTNET);
+
+        document.getElementById("status").innerHTML = `<p style="color:#f59e0b">Enviando para a rede Stellar Testnet...</p>`;
+
+        /*
+          Submeter ao Horizon
+        */
+        const result = await server.submitTransaction(signedTx);
+        const txHash = result.hash;
 
         /*
           Explorer
@@ -578,9 +662,57 @@
 
         `
 
+        // Buscar histórico
+        fetchHistory(matricula);
+
       } catch(err){
 
         console.error(err)
+      }
+    }
+
+    async function fetchHistory(matriculaToSearch) {
+      if (!publicKey) return;
+      
+      const historyContainer = document.getElementById("historyContainer");
+      const tbody = document.getElementById("historyTableBody");
+      historyContainer.style.display = "block";
+      tbody.innerHTML = "<tr><td colspan='3' style='text-align:center; padding: 10px;'>Buscando histórico na rede Stellar...</td></tr>";
+      
+      try {
+        const response = await server.operations()
+          .forAccount(publicKey)
+          .limit(100)
+          .order('desc')
+          .call();
+          
+        const records = response.records;
+        const filteredOps = records.filter(op => 
+          op.type === 'manage_data' && 
+          op.name === matriculaToSearch.slice(0, 64)
+        );
+        
+        if (filteredOps.length === 0) {
+          tbody.innerHTML = "<tr><td colspan='3' style='text-align:center; padding: 10px; color: #94a3b8;'>Nenhuma ancoragem anterior encontrada na blockchain para esta matrícula.</td></tr>";
+          return;
+        }
+        
+        tbody.innerHTML = "";
+        for (const op of filteredOps) {
+          const date = new Date(op.created_at).toLocaleString('pt-BR');
+          const hashVal = atob(op.value);
+          const txHashShort = op.transaction_hash.slice(0, 6) + "..." + op.transaction_hash.slice(-6);
+          
+          tbody.innerHTML += `
+            <tr style="border-bottom: 1px solid #334155;">
+              <td style="padding: 10px 0; color: #cbd5e1;">${date}</td>
+              <td style="padding: 10px 0; font-family: monospace; color: #e2e8f0;" title="${hashVal}">${hashVal.slice(0,8)}...${hashVal.slice(-8)}</td>
+              <td style="padding: 10px 0;"><a href="https://stellar.expert/explorer/testnet/tx/${op.transaction_hash}" target="_blank" style="color: #38bdf8; text-decoration: none; font-weight: bold;">${txHashShort}</a></td>
+            </tr>
+          `;
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan='3' style='text-align:center; padding: 10px; color: #ef4444;'>Erro ao buscar histórico: ${err.message}</td></tr>`;
       }
     }
 

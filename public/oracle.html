@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IPTU Chain - Oráculo de Auditoria</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: #0f172a;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      background: #1e293b;
+      padding: 40px;
+      border-radius: 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    h1 {
+      text-align: center;
+      color: #38bdf8;
+      margin-bottom: 10px;
+      font-size: 2rem;
+    }
+
+    p.subtitle {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #94a3b8;
+      font-size: 1.1rem;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    input {
+      flex: 1;
+      padding: 16px;
+      border: 2px solid #334155;
+      border-radius: 12px;
+      background: #0f172a;
+      color: white;
+      font-size: 1.1rem;
+      outline: none;
+      transition: border 0.3s;
+    }
+
+    input:focus {
+      border-color: #38bdf8;
+    }
+
+    button {
+      padding: 16px 24px;
+      border: none;
+      border-radius: 12px;
+      background: #38bdf8;
+      color: #0f172a;
+      font-weight: bold;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.3s;
+    }
+
+    button:hover {
+      background: #0284c7;
+      transform: scale(1.05);
+      color: white;
+    }
+
+    button:disabled {
+      background: #334155;
+      color: #94a3b8;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .card {
+      background: #334155;
+      padding: 25px;
+      border-radius: 16px;
+      display: none;
+      flex-direction: column;
+      gap: 15px;
+      animation: fadeIn 0.5s;
+      border-left: 8px solid transparent;
+    }
+
+    .card.apto {
+      display: flex;
+      border-left-color: #22c55e;
+    }
+
+    .card.divergente {
+      display: flex;
+      border-left-color: #ef4444;
+    }
+
+    .card.novo {
+      display: flex;
+      border-left-color: #3b82f6;
+    }
+
+    .card.error {
+      display: flex;
+      border-left-color: #f59e0b;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 1.2rem;
+      align-self: flex-start;
+    }
+
+    .apto .status-badge {
+      background: rgba(34, 197, 94, 0.2);
+      color: #4ade80;
+    }
+
+    .divergente .status-badge {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+    }
+
+    .novo .status-badge {
+      background: rgba(59, 130, 246, 0.2);
+      color: #60a5fa;
+    }
+
+    .data-row {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .label {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .value {
+      font-family: monospace;
+      background: #0f172a;
+      padding: 12px;
+      border-radius: 8px;
+      word-break: break-all;
+      font-size: 0.95rem;
+      color: #e2e8f0;
+    }
+
+    .explorer-link {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .explorer-link a {
+      color: #38bdf8;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .explorer-link a:hover {
+      text-decoration: underline;
+    }
+
+    .loader {
+      border: 4px solid #334155;
+      border-top: 4px solid #38bdf8;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      display: none;
+      margin: 0 auto;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>IPTU Chain</h1>
+    <p class="subtitle">Oráculo de Auditoria Fiscal Blockchain</p>
+
+
+    <div style="background: #1e293b; padding: 15px; text-align: center; margin-bottom: 20px; border-radius: 12px; border: 2px solid #38bdf8;">
+  <h2 style="color: #38bdf8; margin-bottom: 10px;">V2: Abordagem Centralizada (Oráculo)</h2>
+  <p style="color: #cbd5e1; margin-bottom: 10px;">Sincronização automática pela source_account da prefeitura.</p>
+  <a href="index.html" style="color: white; background: #38bdf8; padding: 10px 20px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; margin-right: 10px;">🏠 Voltar para o Início</a>
+  <a href="auditoria_manual_mock.html" style="color: white; background: #334155; padding: 10px 20px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">👈 Ver Assinatura Manual (Mock)</a>
+</div>
+
+    <div class="search-box">
+      <input type="text" id="matricula" placeholder="Ex: IPTU-2026-0001" />
+      <button id="auditBtn">Auditar</button>
+    </div>
+    <div id="loader" class="loader"></div>
+
+
+    <div id="terminal"
+      style="background: #000; color: #0f0; font-family: monospace; padding: 15px; border-radius: 8px; margin-bottom: 20px; height: 150px; overflow-y: auto; display: none;">
+      <div id="terminalContent"></div>
+    </div>
+
+    <div id="resultCard" class="card">
+      <div id="statusBadge" class="status-badge"></div>
+      <p id="message" style="color: #cbd5e1;"></p>
+
+      <div class="data-row">
+        <span class="label">Hash Local (Prefeitura)</span>
+        <span class="value" id="hashLocal">-</span>
+      </div>
+
+      <div class="data-row">
+        <span class="label">Hash Blockchain (Stellar)</span>
+        <span class="value" id="hashOnChain">-</span>
+      </div>
+
+      <div id="explorerDiv" class="explorer-link" style="display:none;">
+        <a id="explorerLink" href="#" target="_blank">Ver Transação na Stellar Expert</a>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/oracle.js"></script>
+</body>
+
+</html>

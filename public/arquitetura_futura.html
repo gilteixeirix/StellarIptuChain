@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Evolução da Arquitetura - IPTU Chain</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+    
+    body {
+      background: linear-gradient(135deg, #020617 0%, #0f172a 100%);
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 20px;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    .glow-1 { position: absolute; top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%); border-radius: 50%; z-index: -1; }
+    .glow-2 { position: absolute; bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%); border-radius: 50%; z-index: -1; }
+
+    .container {
+      max-width: 900px;
+      width: 100%;
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    .back-link {
+      display: inline-block;
+      color: #38bdf8;
+      text-decoration: none;
+      font-weight: 600;
+      margin-bottom: 30px;
+      transition: opacity 0.3s;
+    }
+
+    .back-link:hover { opacity: 0.8; }
+
+    header { margin-bottom: 50px; text-align: center; }
+
+    h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      background: linear-gradient(to right, #38bdf8, #8b5cf6);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 15px;
+      letter-spacing: -1px;
+    }
+
+    .subtitle {
+      font-size: 1.4rem;
+      color: #94a3b8;
+      font-weight: 300;
+    }
+
+    .intro-text {
+      font-size: 1.15rem;
+      color: #cbd5e1;
+      margin-bottom: 40px;
+      text-align: justify;
+    }
+
+    .card {
+      background: rgba(30, 41, 59, 0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 40px;
+      margin-bottom: 30px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.4);
+    }
+
+    .card::before {
+      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+      background: linear-gradient(to right, #38bdf8, #2563eb);
+    }
+
+    .card.highlight::before {
+      background: linear-gradient(to right, #8b5cf6, #ec4899);
+    }
+
+    .card h2 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .card p { margin-bottom: 15px; color: #cbd5e1; }
+    
+    .tradeoffs {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .tradeoffs h4 { color: #f8fafc; margin-bottom: 10px; font-size: 1.1rem; }
+    .tradeoffs ul { margin-left: 20px; color: #cbd5e1; }
+    .tradeoffs li { margin-bottom: 8px; }
+    .tradeoffs strong.pro { color: #10b981; }
+    .tradeoffs strong.con { color: #ef4444; }
+
+    .vision-box {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+      border-left: 4px solid #ec4899;
+      padding: 25px;
+      border-radius: 0 16px 16px 0;
+      margin-top: 40px;
+    }
+
+    .vision-box h3 { color: #ec4899; margin-bottom: 10px; font-size: 1.3rem; }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="glow-1"></div>
+  <div class="glow-2"></div>
+
+  <div class="container">
+    <a href="index.html" class="back-link">← Voltar ao Hub Principal</a>
+    
+    <header>
+      <h1>Evolução da Arquitetura</h1>
+      <p class="subtitle">Como Ancorar Atualizações Legítimas com Segurança?</p>
+    </header>
+
+    <div class="intro-text">
+      <p>O estágio atual do <strong>IPTU Chain</strong> atua como uma robusta Prova de Conceito (PoC) para demonstrar transparência governamental. Nele, garantimos a integridade dos dados validando-os através de um Oráculo (Auditor). No entanto, em um ambiente de produção em larga escala, precisamos garantir que as atualizações legítimas (como revisão do valor do IPTU, pagamentos parciais, etc.) sejam processadas e ancoradas na blockchain de forma inviolável e automática.</p>
+      <p style="margin-top: 15px;">Para atingir essa maturidade e garantir que apenas registros autênticos sejam ancorados, o sistema emissor (aplicação municipal) deve evoluir. Abaixo apresentamos as três principais abordagens arquiteturais para resolver este desafio, destacando seus prós e contras.</p>
+    </div>
+
+    <!-- Abordagem 1 -->
+    <div class="card">
+      <h2><span>⚙️</span> 1. Event Sourcing com Worker Blockchain</h2>
+      <p>Nesta abordagem, a aplicação atua como um sistema orientado a eventos. Sempre que a API da prefeitura efetivar uma alteração legítima no banco de dados (ex: um processo de recálculo deferido por um fiscal), o sistema emite um evento para uma fila de mensageria assíncrona (como RabbitMQ, Apache Kafka ou AWS SQS). Um serviço isolado (Worker) consome essa fila, gera o novo Hash e assina a ancoragem na rede Stellar.</p>
+      
+      <div class="tradeoffs">
+        <h4>Trade-offs:</h4>
+        <ul>
+          <li><strong class="pro">Prós:</strong> Altamente escalável e resiliente. O sistema backend principal não sofre com a latência de comunicação da blockchain. Se a rede Stellar apresentar lentidão, a mensagem permanece segura na fila para retentativa (garantia de entrega).</li>
+          <li><strong class="con">Contras:</strong> Introduz o paradigma de "Consistência Eventual", onde pode haver um pequeno delay de tempo entre o salvamento no banco de dados local e o reflexo na blockchain. Exige uma gestão avançada de infraestrutura de mensageria.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Abordagem 2 -->
+    <div class="card">
+      <h2><span>🔐</span> 2. Assinatura Digital de Payloads</h2>
+      <p>Antes de persistir a alteração no banco de dados relacional, o sistema back-end cria uma assinatura digital assimétrica (usando criptografia RSA ou ECDSA) para o payload do IPTU. O banco de dados passa a armazenar, além dos dados brutos, a assinatura do servidor. O Oráculo, ao auditar ou ancorar, verifica se a criptografia do dado bate com a chave pública do serviço municipal autorizado.</p>
+      
+      <div class="tradeoffs">
+        <h4>Trade-offs:</h4>
+        <ul>
+          <li><strong class="pro">Prós:</strong> Impede que um invasor ou um Administrador de Banco de Dados (DBA) faça alterações manuais fraudulentas diretamente na base de dados (Update in-place), pois ele não tem como forjar a assinatura sem passar pela regra de negócio.</li>
+          <li><strong class="con">Contras:</strong> A segurança é falha caso a aplicação principal seja completamente comprometida. Se o atacante acessar as chaves do servidor (vazamento de API Keys), ele ainda poderá assinar dados fraudulentos, validando a fraude.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Abordagem 3 -->
+    <div class="card highlight">
+      <h2><span>🚀</span> 3. A Evolução Definitiva: Smart Contracts (Soroban)</h2>
+      <p>Para que a aplicação atinja o estado da arte em segurança, descentralização e confiança (Trustless), o modelo de simplesmente salvar Hashes de forma passiva através de operações de ManageData deve evoluir para <strong>Contratos Inteligentes (Smart Contracts)</strong> utilizando a plataforma <strong>Soroban</strong> nativa da rede Stellar.</p>
+      <p>Ao invés da regra de negócio existir exclusivamente no banco de dados da prefeitura, ela passa a viver na própria blockchain. Quando há uma necessidade de alterar o IPTU, a prefeitura não apenas altera o seu banco local. Ela invoca a função <code>update_tax_record</code> diretamente no Contrato Inteligente na Stellar. O contrato exige que as condições matemáticas e de negócio sejam satisfeitas antes de atualizar o "Estado Oficial" do IPTU.</p>
+      
+      <div class="tradeoffs">
+        <h4>Vantagens Estratégicas:</h4>
+        <ul style="margin-bottom: 20px;">
+          <li><strong>Imutabilidade em Nível de Regra de Negócio:</strong> A lógica de recálculo ou perdão de dívida fica codificada na blockchain. Ninguém pode alterar o imposto sem cumprir as exigências codificadas.</li>
+          <li><strong>Aprovação Multi-assinatura (Multisig):</strong> Alterações drásticas podem exigir assinaturas conjuntas (ex: do auditor fiscal, do sistema automatizado e do chefe da receita).</li>
+          <li><strong>Auditoria Transparente e Ativa:</strong> Qualquer alteração disparará eventos que o frontend cidadão pode escutar e validar em tempo real.</li>
+        </ul>
+
+        <h4>Trade-offs:</h4>
+        <ul>
+          <li><strong class="con">Desafio Técnico:</strong> Exige reescrever parte fundamental da lógica transacional do backend em linguagens compatíveis com o ecossistema (ex: Rust).</li>
+          <li><strong class="con">Custo:</strong> Envolve custos marginais por transação computacional (Gas fees) um pouco mais elevados se comparados com transações cruas da Stellar tradicional.</li>
+          <li><strong class="con">Sincronização:</strong> A sincronização entre o banco de dados interno relacional e o estado do Smart Contract (On-chain) requer sincronizadores avançados bidirecionais.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="vision-box">
+      <h3>Visão de Longo Prazo</h3>
+      <p style="color: #cbd5e1; line-height: 1.6;">Migrar para Contratos Inteligentes transforma o projeto de um simples "Carimbo de Tempo Descentralizado" em uma verdadeira <strong>Plataforma Fiscal Autônoma e Inviolável</strong>, eliminando por completo a dependência cega em servidores e bancos de dados centralizados da prefeitura.</p>
+    </div>
+
+  </div>
+</body>
+</html>

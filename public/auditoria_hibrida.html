@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IPTU Chain - Oráculo de Auditoria</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: #0f172a;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      background: #1e293b;
+      padding: 40px;
+      border-radius: 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    h1 {
+      text-align: center;
+      color: #38bdf8;
+      margin-bottom: 10px;
+      font-size: 2rem;
+    }
+
+    p.subtitle {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #94a3b8;
+      font-size: 1.1rem;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    input {
+      flex: 1;
+      padding: 16px;
+      border: 2px solid #334155;
+      border-radius: 12px;
+      background: #0f172a;
+      color: white;
+      font-size: 1.1rem;
+      outline: none;
+      transition: border 0.3s;
+    }
+
+    input:focus {
+      border-color: #38bdf8;
+    }
+
+    button {
+      padding: 16px 24px;
+      border: none;
+      border-radius: 12px;
+      background: #38bdf8;
+      color: #0f172a;
+      font-weight: bold;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.3s;
+    }
+
+    button:hover {
+      background: #0284c7;
+      transform: scale(1.05);
+      color: white;
+    }
+
+    button:disabled {
+      background: #334155;
+      color: #94a3b8;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .card {
+      background: #334155;
+      padding: 25px;
+      border-radius: 16px;
+      display: none;
+      flex-direction: column;
+      gap: 15px;
+      animation: fadeIn 0.5s;
+      border-left: 8px solid transparent;
+    }
+
+    .card.apto {
+      display: flex;
+      border-left-color: #22c55e;
+    }
+
+    .card.divergente {
+      display: flex;
+      border-left-color: #ef4444;
+    }
+
+    .card.novo {
+      display: flex;
+      border-left-color: #3b82f6;
+    }
+
+    .card.error {
+      display: flex;
+      border-left-color: #f59e0b;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 1.2rem;
+      align-self: flex-start;
+    }
+
+    .apto .status-badge {
+      background: rgba(34, 197, 94, 0.2);
+      color: #4ade80;
+    }
+
+    .divergente .status-badge {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+    }
+
+    .novo .status-badge {
+      background: rgba(59, 130, 246, 0.2);
+      color: #60a5fa;
+    }
+
+    .data-row {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .label {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .value {
+      font-family: monospace;
+      background: #0f172a;
+      padding: 12px;
+      border-radius: 8px;
+      word-break: break-all;
+      font-size: 0.95rem;
+      color: #e2e8f0;
+    }
+
+    .explorer-link {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .explorer-link a {
+      color: #38bdf8;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .explorer-link a:hover {
+      text-decoration: underline;
+    }
+
+    .loader {
+      border: 4px solid #334155;
+      border-top: 4px solid #38bdf8;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      display: none;
+      margin: 0 auto;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>IPTU Chain</h1>
+    <p class="subtitle">Oráculo de Auditoria Fiscal Blockchain</p>
+
+
+    <div style="background: #1e293b; padding: 15px; text-align: center; margin-bottom: 20px; border-radius: 12px; border: 2px solid #8b5cf6;">
+  <h2 style="color: #8b5cf6; margin-bottom: 10px;">Auditoria Híbrida (Oráculo + Freighter)</h2>
+  <p style="color: #cbd5e1; margin-bottom: 10px;">O Servidor gerencia a lógica e verifica o banco, mas a Assinatura Final de ancoragem é descentralizada (Web3).</p>
+  <a href="index.html" style="color: white; background: #8b5cf6; padding: 10px 20px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; margin-right: 10px;">🏠 Voltar para o Início</a>
+</div>
+
+    <div style="text-align: center; margin-bottom: 20px;">
+      <p id="walletAddress" style="color: #cbd5e1; font-size: 0.9em;"></p>
+      <a id="walletHistory" href="#" target="_blank" style="color: #38bdf8; font-size: 0.9em; text-decoration: none; display: none; margin-top: 5px;">📊 Ver Histórico de Transações (Stellar Expert)</a>
+    </div>
+
+    <div class="search-box">
+      <input type="text" id="matricula" placeholder="Ex: IPTU-2026-0001" />
+      <button id="auditBtn">Auditar</button>
+    </div>
+    <div id="loader" class="loader"></div>
+
+
+    <div id="terminal"
+      style="background: #000; color: #0f0; font-family: monospace; padding: 15px; border-radius: 8px; margin-bottom: 20px; height: 150px; overflow-y: auto; display: none;">
+      <div id="terminalContent"></div>
+    </div>
+
+    <div id="resultCard" class="card">
+      <div id="statusBadge" class="status-badge"></div>
+      <p id="message" style="color: #cbd5e1;"></p>
+
+      <div class="data-row">
+        <span class="label">Hash Local (Prefeitura)</span>
+        <span class="value" id="hashLocal">-</span>
+      </div>
+
+      <div class="data-row">
+        <span class="label">Hash Blockchain (Stellar)</span>
+        <span class="value" id="hashOnChain">-</span>
+      </div>
+
+      <div id="explorerDiv" class="explorer-link" style="display:none;">
+        <a id="explorerLink" href="#" target="_blank">Ver Transação na Stellar Expert</a>
+      </div>
+    </div>
+
+    <div id="historyContainer" class="card" style="display: none; border-left: 8px solid #8b5cf6; margin-top: 20px;">
+      <h3 style="color: #cbd5e1; margin-bottom: 10px;">Histórico de Ancoragens (Blockchain)</h3>
+      <table style="width: 100%; border-collapse: collapse; font-size: 0.9em; text-align: left;">
+        <thead>
+          <tr style="border-bottom: 1px solid #475569; color: #94a3b8;">
+            <th style="padding: 8px 0;">Data/Hora</th>
+            <th style="padding: 8px 0;">Hash Salvo</th>
+            <th style="padding: 8px 0;">TX</th>
+          </tr>
+        </thead>
+        <tbody id="historyTableBody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/stellar-sdk/13.3.0/stellar-sdk.min.js"></script>
+
+  <script type="module">
+    import * as freighterModule from 'https://cdn.jsdelivr.net/npm/@stellar/freighter-api@3.0.0/+esm';
+    window.freighterApi = freighterModule.default ? freighterModule.default : freighterModule;
+  </script>
+  
+  <script>
+    let publicKey = "";
+    const server = new StellarSdk.Horizon.Server("https://horizon-testnet.stellar.org");
+
+    function addLog(msg, type = 'info') {
+      const term = document.getElementById("terminal");
+      const content = document.getElementById("terminalContent");
+      term.style.display = "block";
+      content.innerHTML += `<div>[${new Date().toLocaleTimeString()}] ${msg}</div>`;
+      term.scrollTop = term.scrollHeight;
+    }
+
+    document.getElementById("auditBtn").addEventListener("click", async (event) => {
+      const matricula = document.getElementById("matricula").value.trim();
+      if (!matricula) {
+        alert("A matrícula não deve ser vazia.");
+        return;
+      }
+      
+      const btn = event.target;
+      
+      btn.disabled = true;
+      document.getElementById("terminalContent").innerHTML = "";
+
+      // 1. Conectar Wallet
+      if (!publicKey) {
+        addLog("Conectando com a carteira Freighter do Auditor...", "info");
+        btn.innerText = "Conectando Wallet...";
+        try {
+          if (!window.freighterApi) {
+            throw new Error("A biblioteca do Freighter não carregou.");
+          }
+          const connectedResponse = await window.freighterApi.isConnected();
+          if (!connectedResponse.isConnected) {
+            throw new Error("A extensão Freighter não foi detectada ou está bloqueada.");
+          }
+          const access = await window.freighterApi.requestAccess();
+          if (access.error) {
+            throw new Error("Acesso negado pelo usuário no Freighter.");
+          }
+          const addressResponse = await window.freighterApi.getAddress();
+          if (addressResponse.error) {
+            throw new Error(addressResponse.error);
+          }
+          publicKey = addressResponse.address;
+          document.getElementById("walletAddress").innerText = `Wallet Auditor Conectada: ${publicKey}`;
+          
+          const historyLink = document.getElementById("walletHistory");
+          historyLink.href = `https://stellar.expert/explorer/testnet/account/${publicKey}`;
+          historyLink.style.display = "inline-block";
+          
+          addLog("Wallet conectada com sucesso!", "success");
+        } catch (err) {
+          addLog(`[ERRO] ${err.message}`, "error");
+          btn.disabled = false;
+          btn.innerText = "Auditar";
+          return;
+        }
+      }
+
+      btn.innerText = "Auditando...";
+      addLog("Iniciando processo de auditoria pela prefeitura...");
+      
+      // Carregar histórico simultaneamente
+      fetchHistory(matricula);
+
+      const es = new EventSource(`/api/auditar/stream?matricula=${matricula}&auditorPublicKey=${publicKey}`);
+
+      es.onmessage = async (e) => {
+        const data = JSON.parse(e.data);
+        if (data.msg) {
+          addLog(data.msg);
+        }
+      };
+
+      es.addEventListener('result', async (e) => {
+        const data = JSON.parse(e.data);
+        
+        if (data.status) {
+          es.close();
+
+          if (data.status === 'AguardandoAssinatura') {
+            addLog("Aguardando assinatura criptográfica do Auditor via Freighter...", "warning");
+            try {
+              const signedXdrResponse = await window.freighterApi.signTransaction(data.xdr, {
+                network: "TESTNET",
+                networkPassphrase: "Test SDF Network ; September 2015"
+              });
+
+              if (signedXdrResponse.error) {
+                throw new Error("Transação rejeitada pelo usuário.");
+              }
+
+              addLog("Transação assinada pelo Auditor. Submetendo à rede Stellar...", "info");
+              const signedTx = StellarSdk.TransactionBuilder.fromXDR(signedXdrResponse.signedTxXdr, StellarSdk.Networks.TESTNET);
+              
+              const result = await server.submitTransaction(signedTx);
+              addLog(`Transação ancorada na blockchain! TX Hash: ${result.hash}`, "success");
+              
+              showCard('Novo', data.hashLocal, data.hashLocal, result.hash, "Registro Novo ancorado com sucesso (Assinatura Híbrida).");
+            } catch (err) {
+              addLog(`[ERRO] ${err.message}`, "error");
+            }
+          } else {
+            showCard(data.status, data.hashLocal, data.hashOnChain || data.hashOnChainAnterior, data.txHash, data.message);
+          }
+          
+          btn.disabled = false;
+          btn.innerText = "Auditar";
+        }
+      });
+
+      es.addEventListener('end', () => {
+        es.close();
+        btn.disabled = false;
+        btn.innerText = "Auditar";
+      });
+
+      es.onerror = (err) => {
+        console.error(err);
+        es.close();
+        btn.disabled = false;
+        btn.innerText = "Auditar";
+        addLog("[ERRO DE CONEXÃO] A conexão com o servidor foi interrompida.", "error");
+      };
+    });
+
+    function showCard(status, localHash, chainHash, txHash, message) {
+        const card = document.getElementById('resultCard');
+        card.className = `card ${status.toLowerCase()}`;
+        document.getElementById('statusBadge').innerText = status;
+        document.getElementById('message').innerText = message;
+        document.getElementById('hashLocal').innerText = localHash;
+        document.getElementById('hashOnChain').innerText = chainHash || "Pendente";
+        
+        if (txHash) {
+            document.getElementById('explorerDiv').style.display = 'block';
+            document.getElementById('explorerLink').href = `https://stellar.expert/explorer/testnet/tx/${txHash}`;
+        }
+    }
+
+    async function fetchHistory(matriculaToSearch) {
+      if (!publicKey) return;
+      
+      const historyContainer = document.getElementById("historyContainer");
+      const tbody = document.getElementById("historyTableBody");
+      historyContainer.style.display = "flex";
+      tbody.innerHTML = "<tr><td colspan='3' style='text-align:center; padding: 10px;'>Buscando histórico na rede Stellar...</td></tr>";
+      
+      try {
+        const response = await server.operations()
+          .forAccount(publicKey)
+          .limit(100)
+          .order('desc')
+          .call();
+          
+        const records = response.records;
+        const filteredOps = records.filter(op => 
+          op.type === 'manage_data' && 
+          op.name === matriculaToSearch.slice(0, 64)
+        );
+        
+        if (filteredOps.length === 0) {
+          tbody.innerHTML = "<tr><td colspan='3' style='text-align:center; padding: 10px; color: #94a3b8;'>Nenhuma ancoragem anterior encontrada na blockchain para esta matrícula.</td></tr>";
+          return;
+        }
+        
+        tbody.innerHTML = "";
+        for (const op of filteredOps) {
+          const date = new Date(op.created_at).toLocaleString('pt-BR');
+          const hashVal = atob(op.value);
+          const txHashShort = op.transaction_hash.slice(0, 6) + "..." + op.transaction_hash.slice(-6);
+          
+          tbody.innerHTML += `
+            <tr style="border-bottom: 1px solid #334155;">
+              <td style="padding: 10px 0; color: #cbd5e1;">${date}</td>
+              <td style="padding: 10px 0; font-family: monospace; color: #e2e8f0;" title="${hashVal}">${hashVal.slice(0,8)}...${hashVal.slice(-8)}</td>
+              <td style="padding: 10px 0;"><a href="https://stellar.expert/explorer/testnet/tx/${op.transaction_hash}" target="_blank" style="color: #38bdf8; text-decoration: none; font-weight: bold;">${txHashShort}</a></td>
+            </tr>
+          `;
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan='3' style='text-align:center; padding: 10px; color: #ef4444;'>Erro ao buscar histórico: ${err.message}</td></tr>`;
+      }
+    }
+  </script>
+</body>
+
+</html>
